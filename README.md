@@ -50,7 +50,7 @@ void main(){
     m2.value(t,k)();
   }
 
-  //dynamic property sim ugly but safe
+  //dynamic property sim
   m = new Object();
   print('=====dynamic property sim====');
   var d = new Dynamism();
