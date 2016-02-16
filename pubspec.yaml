@@ -1,0 +1,12 @@
+name: superexpando
+description: A weakmap with keys method and support for dynamic addition of properties and their invocation based on expando.
+version: 0.0.1
+author: Hiroyuki Notomi <tastydart@gmail.com>
+homepage: https://github.com/TastyCatFood/superexpando
+
+environment:
+  sdk: '>=1.0.0 <2.0.0'
+
+
+dev_dependencies:
+  test: "^0.12.10+2"
