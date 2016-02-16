@@ -30,11 +30,11 @@ class Dynamism {
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     d.invoke(o,'say_hi');
   ///
-  void invoke(var object, String method,
+  dynamic invoke(var object, String method,
       [List args=null]) {
     Function f = _am.value(object,method);
     args ??= [];
-    on(object).call(f,args);
+    return on(object).call(f,args);
   }
 
   ///Returns DynamicWrapper instance.
@@ -117,7 +117,7 @@ class DynamicWrapper{
       }
     }
     if(f == null) super.noSuchMethod(invocation);
-    call(f,args);
+    return call(f,args);
   }
   call(Function f, List args){
     switch(args.length){

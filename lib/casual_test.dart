@@ -57,7 +57,7 @@ void main(){
     m2.value(t,k)();
   }
 
-  //dynamic property sim ugly but safe
+  //dynamic property sim
   m = new Object();
   print('=====dynamic property sim====');
   var d = new Dynamism();
@@ -70,12 +70,19 @@ void main(){
         'Your age is ${age}, you are not '
         'allowed to drink legally');
   });
+
   //get all added methods
   print(d.on(m).methods());
   d.on(m).bye('doggy',5);
   var wrapper = d.on(m);
   wrapper.bye('catty',0);
 
+  //have function return something
+  d.on(m).add_method('sleep',(){
+    return 'you may sleep more than you wish for once the time comes ';
+  });
+  String msg = d.on(m).sleep();
+  print(msg);
 //should throw an error. as on(m) returns a pseudo temporal only object
 //  wrapper.bye('catty',0);
 

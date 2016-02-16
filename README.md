@@ -69,6 +69,13 @@ void main(){
   var wrapper = d.on(m);
   wrapper.bye('catty',0);
 
+  //have function return something
+  d.on(m).add_method('sleep',(){
+    return 'you may sleep more than you wish for once the time comes ';
+  });
+  String msg = d.on(m).sleep();
+  print(msg);
+
 //should throw an error. as on(m) returns a pseudo temporal only object
 //  wrapper.bye('catty',0); 
 
