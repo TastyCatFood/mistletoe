@@ -57,7 +57,7 @@ void main(){
   //dynamic property sim
   m = new Object();
   print('=====dynamic property sim====');
-  var d = new Dynamism();
+  var d = new Dynamism(true);
   d.add_method(m,'hi',(){print('dynamically added hi');});
   d.invoke(m,'hi');
 
