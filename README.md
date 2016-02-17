@@ -11,7 +11,7 @@ Sample code
 import 'mistletoe.dart';
 void main(){
 //sample code for demonstrating an application of AdvancedWeakmap
-  var m = new AdvancedWeakmap();
+  var m = new Mistletoe();
   var t = new DateTime.now();
   //associating key and value on the context of t
   // both key and value should be garbage collected once t has been garbage collected
@@ -42,7 +42,7 @@ void main(){
     print('key two used to fetch this'+t.toString());
   });
  // copying only 'key two' to the new AdvancedWeakmap
-  var m2 = new AdvancedWeakmap();
+  var m2 = new Mistletoe();
   for (var k in m.keys(t)){
     if(k.toString().contains('key two')){
       m2.add(t,k,m.value(t,k));
