@@ -13,8 +13,8 @@ void main(){
 //sample code for demonstrating an application of AdvancedWeakmap
   var m = new Mistletoe();
   var t = new DateTime.now();
-  //associating key and value on the context of t
-  // both key and value should be garbage collected once t has been garbage collected
+  //associating the key and the value on the context of t
+  // both the key and the value should be garbage collected once t has been garbage collected
   m.add(
       t,
       'print time now',

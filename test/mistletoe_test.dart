@@ -52,7 +52,7 @@ void main() {
 
     test('dynamic',(){
       m = new Object();
-      var d = new Dynamism(true);
+      var d = new Dynamism(expert:true);
       d.add_method(m,'hi',(){return 'hi';});
       expect(d.invoke(m,'hi',[]),equals('hi'));
       d.add_method(m,'your_name_please',(name){return 'hi $name';});
@@ -61,7 +61,7 @@ void main() {
 
     test('dynamic wrapper',(){
       m = new Object();
-      var d = new Dynamism(true);
+      var d = new Dynamism(expert:true);
       d.on(m).add_method('ask_age',(name,age){
         return 'hi ${name}, are you really $age?';
       });
@@ -73,6 +73,19 @@ void main() {
           equals('hi owl, are you really 0?'));
       //todo currently [DynamicWrapper] throws a string, do something
 //      expect(wrapper.ask_age('owl',0),throwsA());
+    });
+    test('pop_key',(){
+      var t = new DateTime.now();
+      var o2 = new Object();
+      m.add( o, 'time now', o2);
+      m.add( o, 'over', o2);
+      m.add( o2, t, () =>5);
+      var key1 = m.pop(o,'time now').keys.toList()[0];
+      expect(key1, equals('time now'));
+      var map = m.pop(o,'over');
+      expect(map.runtimeType,equals({}.runtimeType));
+      expect(m.length(o),equals(0));
+      expect(map['over'], equals(o2));
     });
   });
 

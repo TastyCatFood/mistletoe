@@ -44,10 +44,11 @@ void main(){
     m2.value(t,k)();
   }
 
+
   //dynamic property sim
   m = new Object();
   print('=====dynamic property sim====');
-  var d = new Dynamism(true);
+  var d = new Dynamism(expert:true);
   d.add_method(m,'hi',(){print('dynamically added hi');});
   d.invoke(m,'hi');
 

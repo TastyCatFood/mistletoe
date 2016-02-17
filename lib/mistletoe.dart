@@ -85,21 +85,36 @@ class Mistletoe{
       return m[key];
     }
     ///copy values and keys associated
-    ///with the context to a new
+    ///with the contexts to a new
     ///Mistletoe.
     ///Deleting the original should not
     ///affect the copy
     partial_copy(List contexts){
       var newMap = new Mistletoe();
-      for(var c in contexts)
-        for(var k in keys(c))
-          newMap.add(c,k,value(c,k));
+      for(var c in contexts) {
+        newMap._map[c] = {};
+        newMap._map[c].addAll(_map[c]);
+//        for (var k in keys(c)) {
+//          newMap.add(c, k, value(c, k));
+//        }
+      }
       return newMap;
     }
-    dynamic pop_key(context,key){
-      var k = _map[context][key];
+
+    ///Returns a LinkedHashMap
+    ///
+    ///{key:value}
+    ///
+    ///The key value set is
+    ///removed from this instance
+    ///
+    Map pop(context,key){
+      var v = _map[context][key];
       _map[context].remove(key);
-      return k;
+      return {key:v};
+    }
+    remove(context,key){
+      _map[context].remove(key);
     }
     int length(context){
       var v = _map[context]?.length;

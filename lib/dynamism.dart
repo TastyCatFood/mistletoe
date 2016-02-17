@@ -2,17 +2,17 @@ part of mistletoe;
 /// Adds properties and methods to objects.
 ///
 ///
-///     var d = new Dynamism(true);
+///     var d = new Dynamism(expert:true);
 ///     var o = new Object();
 ///     d.on(o).add('say_hi',()=>print('hi you'));
 ///     d.on(o).say_hi();//prints: hi you
 ///     o = null;//removes everything
 class Dynamism {
-  ///var d = new Dynamism(true); to use.
+  ///var d = new Dynamism(expert:true); to use.
   ///
   /// Never do:
   ///
-  ///     var d = new Dynamism(true);
+  ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     var strong_reference = d.on(o);
@@ -25,12 +25,12 @@ class Dynamism {
   /// o alive as a strong reference.
   ///
   /// Do:
-  ///     var d = new Dynamism(true);
+  ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     d.on(o).say_hay();
   ///
-  Dynamism(bool expert){
+  Dynamism({bool expert:false}){
     if(!expert){
       String msg = '[on] method returns a'
           ' DynamicWrapper which is meant '
@@ -48,7 +48,7 @@ class Dynamism {
   ///an existing object.
   ///e.g.
   ///
-  ///     var d = new Dynamism(true);
+  ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     d.on(o).say_hi();//prints: hi you
@@ -67,7 +67,7 @@ class Dynamism {
   ///
   /// e.g.
   ///
-  ///     var d = new Dynamism(true);
+  ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     d.invoke(o,'say_hi');
@@ -88,7 +88,7 @@ class Dynamism {
   ///temporal object
   ///e.g.
   ///
-  ///     var d = new Dynamism(true);
+  ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     d.on(o).say_hi();//prints: hi you
@@ -98,7 +98,7 @@ class Dynamism {
   ///
   /// Never do:
   ///
-  ///     var d = new Dynamism(true);
+  ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     var strong_reference = d.on(o);
@@ -109,7 +109,7 @@ class Dynamism {
   /// unused, it keeps o alive as a strong reference.
   ///
   /// Do:
-  ///     var d = new Dynamism(true);
+  ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     d.on(o).say_hay();
@@ -150,9 +150,10 @@ class DynamicWrapper{
   }
   noSuchMethod(Invocation invocation) {
     if(_destroyed){
-      throw 'DynamicWrapper reused error: '
+      String msg = 'DynamicWrapper reused error: '
           'Dynamism_instance.on(object) must be '
           'used as a temporal object';
+      throw new StateError(msg);
     }
     Symbol methodSymbol = invocation.memberName;
     List args = invocation.positionalArguments;
@@ -187,8 +188,18 @@ class DynamicWrapper{
         return _call6(f,args);
       case 7:
         return _call7(f,args);
+      case 8:
+        return _call8(f,args);
+      case 9:
+        return _call9(f,args);
+      case 10:
+        return _call10(f,args);
+      case 11:
+        return _call11(f,args);
     }
-    throw 'DynamicWrapper only supports up to 7 parameters';
+    String msg = 'DynamicWrapper '
+        'only supports up to 11 parameters';
+    throw new ArgumentError(msg);
   }
   _call1(Function f,List l){
     var one=l[0];
@@ -234,6 +245,40 @@ class DynamicWrapper{
     var one=l[0], two=l[1], three =l[2]
     ,four =l[3],five = l[4],six=l[5],seven=l[6];
     var r = f(one,two,three,four,five,six,seven);
+    _destroy();
+    return r;
+  }
+  _call8(Function f,List l){
+    var one=l[0], two=l[1], three =l[2]
+    ,four =l[3],five = l[4],six=l[5],seven=l[6],
+    p8=l[7];
+    var r = f(one,two,three,four,five,six,seven,p8);
+    _destroy();
+    return r;
+  }
+  _call9(Function f,List l){
+    var one=l[0], two=l[1], three =l[2]
+    ,four =l[3],five = l[4],six=l[5],seven=l[6],
+        p8=l[7],p9=l[8];
+    var r = f(one,two,three,four,five,six,seven,p8,p9);
+    _destroy();
+    return r;
+  }
+  _call10(Function f,List l){
+    var one=l[0], two=l[1], three =l[2]
+    ,four =l[3],five = l[4],six=l[5],seven=l[6],
+        p8=l[7],p9=l[8],p10=l[9];
+    var r = f(one,two,three,four,five,six,
+        seven,p8,p9,p10);
+    _destroy();
+    return r;
+  }
+  _call11(Function f,List l){
+    var one=l[0], two=l[1], three =l[2]
+    ,four =l[3],five = l[4],six=l[5],seven=l[6],
+        p8=l[7],p9=l[8],p10=l[9],p11=l[10];
+    var r = f(one,two,three,four,five,six,
+        seven,p8,p9,p10,p11);
     _destroy();
     return r;
   }
