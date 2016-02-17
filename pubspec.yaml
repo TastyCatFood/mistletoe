@@ -1,4 +1,4 @@
-name: mitstletoe
+name: mistletoe
 description: A weakmap with keys method and support for dynamic addition of properties and their invocation.
 version: 0.0.1
 author: Hiroyuki Notomi <tastydart@gmail.com>
