@@ -7,6 +7,7 @@ part of mistletoe;
 ///     d.on(o).add('say_hi',()=>print('hi you'));
 ///     d.on(o).say_hi();//prints: hi you
 ///     o = null;//removes everything
+///
 class Dynamism {
   ///var d = new Dynamism(expert:true); to use.
   ///
@@ -16,15 +17,17 @@ class Dynamism {
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     var strong_reference = d.on(o);
-  ///     //and store strong_reference without using
+  ///     //Never store the variable
+  ///     //strong_reference without using
   ///
   /// [on] method returns a [DynamicWrapper]
   /// instance which contains a strong
   /// reference to o. Once used it destroys
   /// itself, but when stored unused, it keeps
-  /// o alive as a strong reference.
+  /// the object o alive as a strong reference.
   ///
   /// Do:
+  ///
   ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));
@@ -53,6 +56,7 @@ class Dynamism {
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     d.on(o).say_hi();//prints: hi you
   ///     o = null;//removes everything
+  ///
   add_method(
       var targetObject,
       String methodName,
@@ -102,13 +106,17 @@ class Dynamism {
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     var strong_reference = d.on(o);
-  ///     //and store strong_reference without using
+  ///     //never store the variable
+  ///     //strong_reference without using
   ///
-  /// [on] method returns a dynamic wrapper which contains a strong
-  /// reference to o. Once used it destroys itself, but when stored
-  /// unused, it keeps o alive as a strong reference.
+  /// [on] method returns a dynamic wrapper
+  /// which contains a strong reference to o.
+  /// Once used it destroys itself, but when stored
+  /// unused, tt keeps the object o alive as a strong
+  /// reference.
   ///
   /// Do:
+  ///
   ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));

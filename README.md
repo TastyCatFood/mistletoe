@@ -1,87 +1,107 @@
 # Mistletoe
-A weakmap with keys method and support for dynamic addition of properties and their invocation.
+A weakmap variant.
+- Has keys method
+- Support pseudo dynamic addition of properties
+
 
 Mistletoes or the group of plants in the genus Viscum are parasitic and grow on another tree.
-Likewise, mistletoe grows on existing objects and what has grown disappears when the host object is garbage collected.
+Likewise, mistletoe grows objects on an existing object and those parasitic objects wither and are garbage collected when the host object has been garbage collected.
 
-# Currently in alpha
+# Currently in Beta(Basic tests are done)$
 
 Sample code
 <code><pre>
-import 'mistletoe.dart';
+import 'package:mitstletoe/mistletoe.dart';
+
 void main(){
-//sample code for demonstrating an application of AdvancedWeakmap
+  //sample code for demonstrating an
+  // application of Mistletoe.
+
   var m = new Mistletoe();
   var t = new DateTime.now();
-  //associating the key and the value on the context of t
-  // both the key and the value should be garbage collected once t has been garbage collected
-  m.add(
-      t,
-      'print time now',
-      () =>print(t));
+  // Associating the key 'print time now'
+  // and the value ()=>print(t) on the context
+  // of the object t; both the key and the value
+  // should be garbage collected once t has been
+  // garbage collected.
+  m.add( t, 'print time now', () =>print(t));
 
-  // fetching all the keys that can be used to fetch
-  // values in the context of t
+  // Getting keys store in m on the the context of t
+  print(m.keys(t));
+  // Accessing the stored value
   for (var k in m.keys(t)) {
-    print(k.toString()); // 'print time now' will be printed
-    m.value(t, k)(); //value fetched is the function ()=>print(t)
+    // 'print time now' will be printed
+    print(k.toString());
+    //()=>print(t) is invoked
+    m.value(t, k)();
   }
-  //check the number of properties stored in the context of t on m.
-  print(m.get_length(t));
-  //now destroying all keys, values by destroying the context t
+  // Find the number on values stored
+  // on the context of t in m.
+  print(m.length(t));
+  // Destroying the context t.
+  // All keys, values in m stored on
+  // the context t should be garbage
+  // collected now.
   t = null;
-  //creating a partial copy of the AdvancedWeakmap m
-  print('==copying partially(only '
-      'key two and its associates will be copied)==');
- //adding new key value pairs to now empty m on the context of new t;
+
+  // Copying
   t = new Object();
-  m.add(t, 'key one', () {
-    print('key one used to fetch this:'+t.toString());
-  });
-  m.add(t, 'key two', () {
-    print('key two used to fetch this'+t.toString());
-  });
- // copying only 'key two' to the new AdvancedWeakmap
+  m.add(t, 'key one', ()=>print('key one'));
+  m.add(t, 'key two', ()=>print('key two'));
+
+  // copying only 'key two'
   var m2 = new Mistletoe();
   for (var k in m.keys(t)){
     if(k.toString().contains('key two')){
       m2.add(t,k,m.value(t,k));
     }
   }
-  //using the copied key value pair
+  //Only key two copied
   for(var k in m2.keys(t)) {
     print(k.toString());
     m2.value(t,k)();
   }
 
-  //dynamic property sim
+
+  //Dynamic property sim
   m = new Object();
   print('=====dynamic property sim====');
   var d = new Dynamism(expert:true);
-  d.add_method(m,'hi',(){print('dynamically added hi');});
+  d.add_method(m,'hi',(){
+    print('dynamically added hi called');});
   d.invoke(m,'hi');
 
-  //More human readable form
-  d.on(m).add_method('bye',(name,age){
-    print("dynamically added bye \n ${name}, "
-        'Your age is ${age}, you are not '
-        'allowed to drink legally');
-  });
-  //get all added methods
+  // View all added methods
   print(d.on(m).methods());
-  d.on(m).bye('doggy',5);
-  var wrapper = d.on(m);
-  wrapper.bye('catty',0);
 
-  //have function return something
-  d.on(m).add_method('sleep',(){
+  //More human friendly syntax
+  d.on(m).add_method('age_check',(name,age){
+    print('hi ${name}, are you really ${age}?' );
+  });
+
+  d.on(m).age_check('doggy',5);
+
+  // Never do the below
+  // The method on returns
+  // a DynamicWrapper which
+  // contains a strong reference.
+  // Once used, a DynamicWrapper
+  // destroys itself, but if stored
+  // will keep the wrapped object,
+  // in the case below m, alive.
+  var wrapper = d.on(m);
+  wrapper.age_check('owl',0);
+
+  //Have a function return something
+  d.on(m).add_method('let_me_sleep',(){
     return 'you may sleep more than you wish for once the time comes ';
   });
-  String msg = d.on(m).sleep();
+  String msg = d.on(m).let_me_sleep();
   print(msg);
-
-//should throw an error. as on(m) returns a pseudo temporal only object
-//  wrapper.bye('catty',0); 
+  // The below should throw an error.
+  // A DynamicWapper object can only be
+  // used once.
+  //wrapper.bye('owl',0);
 
 }
 </code></pre>
