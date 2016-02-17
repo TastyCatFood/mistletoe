@@ -2,9 +2,9 @@
 A weakmap with keys method and support for dynamic addition of properties and their invocation.
 
 Mistletoes or the group of plants in the genus Viscum are parasitic and grow on another tree.
-Likewise, mistletoe grows on existing objects and die when those objects die.
+Likewise, mistletoe grows on existing objects and what has grown disappears when the host object is garbage collected.
 
-#Currently in alpha
+# Currently in alpha
 
 Sample code
 <code><pre>

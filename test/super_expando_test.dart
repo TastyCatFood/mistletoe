@@ -10,81 +10,70 @@ void main() {
   group('A group of tests', () {
     var o;
     var m;
-    m = new Mistletoe();
-    o = new DateTime.now();
-//    setUp(() {
-//      m = new Mistletoe();
-//      o = new DateTime.now();
-//    });
-
-//    test('First Test', () {
-//      expect(awesome.isAwesome, isTrue);
-//    });
-
-    //associating key and value on the context of t
-    // both key and value should be garbage collected when t is garbage collected
-    m.add(
-        o,
-        'print time now',
-        () =>print(o));
-
-
-//fetching all the keys than can be used to fetch values in the context of t
-    for (var k in m.keys(o)) {
-      print(k.toString()); // 'print time now' will be printed
-      m.value(o, k)(); //value fetched is the function ()=>print(t)
-    }
-    //now destroying all keys, values by destroying the context t
-    o = null;
-
-//creating a partial copy of the Mistletoe m
-    print('==copying partially(only '
-        'key two and its associates copied)==');
-    //adding new key value pairs to now empty m
-    o = new DateTime.now();
-    m.add(o, 'key one', () {
-      print('key one used to fetch this:'+o.toString());
+    setUp(() {
+      m = new Mistletoe();
+      o = new DateTime.now();
     });
-    m.add(o, 'key two', () {
-      print('key two used to fetch this'+o.toString());
+
+    test('adding to Mistletoe instance', () {
+      expect( m.add( o, 'print time now', () =>print(o)), isNull );
+      var t = new DateTime.now();
+      expect( m.add( o, t, () =>print(o)), isNull );
     });
-    // copying only 'key two' to the new Mistletoe
-    var m2 = new Mistletoe();
-    for (var k in m.keys(o)){
-      if(k.toString().contains('key two')){
-        m2.add(o,k,m.value(o,k));
-      }
-    }
-    //using the copied key value pair
-    for(var k in m2.keys(o)) {
-      print(k.toString());
-      m2.value(o,k)();
-    }
 
-
-//dynamic property sim ugly but safe
-    m = new Object();
-    print('=====dynamic property sim====');
-    var d = new Dynamism();
-    d.add_method(m,'hi',(){print('dynamically added hi');});
-    d.invoke((){m.hi();},m);
-
-
-
-// improved, but the return value of on call
-    // now contains a strong reference to the key.
-    // var strongReferenceTo_m = d.on(m);
-    // potentially dangerous.
-    d.on(m).add_method('bye',(name,age){
-      print("dynamically added bye \n ${name}, "
-          'Your age is ${age}, you are not '
-          'allowed to drink legally');
+    test('fetching keys from Mistletoe instance',(){
+      var t = new DateTime.now();
+      m.add( o, 'time now', () =>t.toString());
+      m.add( o, t, () =>print(o));
+      expect( m.keys(o).toList(), isList );
+      expect(m.keys(o).toList()[0],equals('time now'));
+      expect(m.keys(o).toList()[1].runtimeType,equals(DateTime));
     });
-    //get all added methods
-    print(d.on(m).methods());
-    d.on(m).bye('doggy',5);
-    var wrapper = d.on(m);//doing this is create a strong reference and dangerous
-    wrapper.bye('catty',0);
-//    wrapper.bye('catty',0); //should throw an error as the object the on method returns only can be called once.
+
+    test('access values',(){
+      var t = new DateTime.now();
+      var o2 = new Object();
+      m.add( o, 'time now', o2);
+      m.add( o, t, () =>5);
+      expect(m.value(o,'time now'),equals(o2));
+      expect(m.value(o,t)(),equals(5));
+    });
+    test('partial copy and length',(){
+      var t = new DateTime.now();
+      var o2 = new Object();
+      m.add( o, 'time now', o2);
+      m.add( o2, t, () =>5);
+      var m2 = m.partial_copy([o2]);
+      expect(m.length(o),equals(1));
+      expect(m2.length(o),equals(0));
+      expect(m2.length(o2),equals(1));
+      expect(m2.value(o2,t)(),equals(5));
+    });
+
+    test('dynamic',(){
+      m = new Object();
+      var d = new Dynamism();
+      d.add_method(m,'hi',(){return 'hi';});
+      expect(d.invoke(m,'hi',[]),equals('hi'));
+      d.add_method(m,'your_name_please',(name){return 'hi $name';});
+      expect(d.invoke(m,'your_name_please',['owl']),equals('hi owl'));
+    });
+
+    test('dynamic wrapper',(){
+      m = new Object();
+      var d = new Dynamism();
+      d.on(m).add_method('ask_age',(name,age){
+        return 'hi ${name}, are you really $age?';
+      });
+      expect(d.on(m).methods(),equals(['ask_age']));
+      expect(d.on(m).ask_age('doggy',5),
+        equals('hi doggy, are you really 5?'));
+      var wrapper = d.on(m);
+      expect(wrapper.ask_age('owl',0),
+          equals('hi owl, are you really 0?'));
+      //todo currently [DynamicWrapper] throws a string, do something
+//      expect(wrapper.ask_age('owl',0),throwsA());
+    });
   });
+
 }

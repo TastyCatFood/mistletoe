@@ -1,5 +1,12 @@
 part of mistletoe;
-
+/// Add properties and methods to objects.
+///
+///
+///     var d = new Dynamism();
+///     var o = new Object();
+///     d.on(o).add('say_hi',()=>print('hi you'));
+///     d.on(o).say_hi();//prints: hi you
+///     o = null;//removes everything
 class Dynamism {
   Mistletoe _am = new Mistletoe();
   ///Adds a dynamic property to
@@ -19,7 +26,7 @@ class Dynamism {
         newMethod);
   }
   ///Invokes a dynamically added method.
-  ///Unlike the on method, invoke takes
+  ///Unlike the [on] method, invoke takes
   ///the method name as a string, arguments
   ///as a list.
   ///
@@ -77,6 +84,7 @@ class DynamicWrapper{
       this._awm,
       [bool allow_strong_reference=false]
       ){
+    //todo consult someone if allow_strong_reference is worth the trouble
     if(!allow_strong_reference)
       new Future((){this._destroy();});
   }
