@@ -1,10 +1,14 @@
-# superexpando
+# Mistletoe
 A weakmap with keys method and support for dynamic addition of properties and their invocation.
+
+Mistletoes or the group of plants in the genus Viscum are parasitic and grow on another tree.
+Likewise, mistletoe grows on existing objects and die when those objects die.
+
 #Currently in alpha
 
 Sample code
 <code><pre>
-import 'super_expando.dart';
+import 'mistletoe.dart';
 void main(){
 //sample code for demonstrating an application of AdvancedWeakmap
   var m = new AdvancedWeakmap();

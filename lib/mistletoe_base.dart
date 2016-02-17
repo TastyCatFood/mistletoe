@@ -1,4 +1,4 @@
-library super_expando;
+library mistletoe;
 
 //async is used by DynamicWrapper to ensure
 //DynamicWrapper objects get deleted and
@@ -10,15 +10,37 @@ part 'dynamism.dart';
 
 ///A Weakmap variant
 ///The lifespan of keys and values
-///depends on the life of context object.
-class AdvancedWeakmap{
+///depends on the lifespan of
+///the context object.
+///Mistletoe is a parasitic plant,
+///likewise Mistletoe objects grows new
+///objects on existing objects.
+///
+/// e.g.
+///
+///     var m = new Mistletoe();
+///     var o = new Object();
+///     //o is a context object
+///     m.add(o,'hi',()=>print('hi'));
+///     var key = new Object();
+///     m.add(o,key,100);
+///     m.value(o,'hi')();
+///     //()=>print('hi'); gets called
+///
+///     print(m.value(o,key));
+///
+///     o = null
+///     //now no reference to 'hi' and ()=>print('hi')
+///     //should exist in m as the context is garbage
+///     //collected.
+class Mistletoe{
   Expando _map = new Expando();
   ///Keys and values should be garbage collected
   ///once their context object has been garbage
   ///collected.
   /// e.g.
   ///
-  ///     var m = new AdvancedWeakmap();
+  ///     var m = new Mistletoe();
   ///     var o = new Object();
   ///     m.add(o,'hi',()=>print('hi'));
   ///     var key = new Object();
@@ -38,7 +60,8 @@ class AdvancedWeakmap{
   }
   ///Returns keys that can be used with the
   ///context to fetch values stored
-  ///on the context.
+  ///in this Mistletoe instance on
+  ///the given context.
   //todo see if ?.toList()is needed
   keys(var context) => _map[context]?.keys;
 
@@ -47,7 +70,7 @@ class AdvancedWeakmap{
     ///
     /// e.g.
     ///
-    ///     var m = new AdvancedWeakmap();
+    ///     var m = new Mistletoe();
     ///     var o = new Object();
     ///     m.add(o,'hi',()=>print('hi'));
     ///     var key = new Object();
@@ -65,11 +88,11 @@ class AdvancedWeakmap{
     }
     ///copy values and keys associated
     ///with the context to a new
-    ///AdvancedWeakmap.
+    ///Mistletoe.
     ///Deleting the original should not
     ///affect the copy
     partial_copy(var context){
-      var newMap = new AdvancedWeakmap();
+      var newMap = new Mistletoe();
       for(var k in keys(context))
         newMap.add(context,k,value(context,k));
       return newMap;

@@ -3,17 +3,17 @@
 
 library super_expando.test;
 
-import '../lib/super_expando.dart';
+import '../lib/mistletoe.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('A group of tests', () {
     var o;
     var m;
-    m = new AdvancedWeakmap();
+    m = new Mistletoe();
     o = new DateTime.now();
 //    setUp(() {
-//      m = new AdvancedWeakmap();
+//      m = new Mistletoe();
 //      o = new DateTime.now();
 //    });
 
@@ -37,7 +37,7 @@ void main() {
     //now destroying all keys, values by destroying the context t
     o = null;
 
-//creating a partial copy of the AdvancedWeakmap m
+//creating a partial copy of the Mistletoe m
     print('==copying partially(only '
         'key two and its associates copied)==');
     //adding new key value pairs to now empty m
@@ -48,8 +48,8 @@ void main() {
     m.add(o, 'key two', () {
       print('key two used to fetch this'+o.toString());
     });
-    // copying only 'key two' to the new AdvancedWeakmap
-    var m2 = new AdvancedWeakmap();
+    // copying only 'key two' to the new Mistletoe
+    var m2 = new Mistletoe();
     for (var k in m.keys(o)){
       if(k.toString().contains('key two')){
         m2.add(o,k,m.value(o,k));

@@ -1,7 +1,7 @@
-import 'super_expando.dart';
+import 'mistletoe.dart';
 void main(){
-//sample code for demonstrating an application of AdvancedWeakmap
-  var m10 = new AdvancedWeakmap();
+//sample code for demonstrating an application of Mistletoe
+  var m10 = new Mistletoe();
   var o10 = new Object();
   m10.add(o10,'hi',()=>print('hi'));
   var key = new Object();
@@ -13,7 +13,7 @@ void main(){
   var no = new Object();
   map[null] = 'yahooo';
   print(map[null]);
-  var m = new AdvancedWeakmap();
+  var m = new Mistletoe();
   var t = new DateTime.now();
   //associating key and value on the context of t
   // both key and value should be garbage collected once t has been garbage collected
@@ -33,7 +33,7 @@ void main(){
   print(m.get_length(t));
   //now destroying all keys, values by destroying the context t
   t = null;
-  //creating a partial copy of the AdvancedWeakmap m
+  //creating a partial copy of the Mistletoe m
   print('==copying partially(only '
       'key two and its associates will be copied)==');
   //adding new key value pairs to now empty m on the context of new t;
@@ -44,8 +44,8 @@ void main(){
   m.add(t, 'key two', () {
     print('key two used to fetch this'+t.toString());
   });
-  // copying only 'key two' to the new AdvancedWeakmap
-  var m2 = new AdvancedWeakmap();
+  // copying only 'key two' to the new Mistletoe
+  var m2 = new Mistletoe();
   for (var k in m.keys(t)){
     if(k.toString().contains('key two')){
       m2.add(t,k,m.value(t,k));
@@ -78,10 +78,10 @@ void main(){
   wrapper.bye('catty',0);
 
   //have function return something
-  d.on(m).add_method('sleep',(){
+  d.on(m).add_method('let_me_sleep',(){
     return 'you may sleep more than you wish for once the time comes ';
   });
-  String msg = d.on(m).sleep();
+  String msg = d.on(m).let_me_sleep();
   print(msg);
 //should throw an error. as on(m) returns a pseudo temporal only object
 //  wrapper.bye('catty',0);

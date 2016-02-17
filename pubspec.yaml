@@ -1,8 +1,8 @@
-name: superexpando
-description: A weakmap with keys method and support for dynamic addition of properties and their invocation based on expando.
+name: mitstletoe
+description: A weakmap with keys method and support for dynamic addition of properties and their invocation.
 version: 0.0.1
 author: Hiroyuki Notomi <tastydart@gmail.com>
-homepage: https://github.com/TastyCatFood/superexpando
+homepage: https://github.com/TastyCatFood/mistletoe
 
 environment:
   sdk: '>=1.0.0 <2.0.0'

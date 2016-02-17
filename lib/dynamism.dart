@@ -1,7 +1,7 @@
-part of super_expando;
+part of mistletoe;
 
 class Dynamism {
-  AdvancedWeakmap _am = new AdvancedWeakmap();
+  Mistletoe _am = new Mistletoe();
   ///Adds a dynamic property to
   ///an existing object.
   ///e.g.
@@ -71,7 +71,7 @@ class Dynamism {
 class DynamicWrapper{
   var _key_object;
   bool _destroyed = false;
-  AdvancedWeakmap _awm;
+  Mistletoe _awm;
   DynamicWrapper(
       this._key_object,
       this._awm,
