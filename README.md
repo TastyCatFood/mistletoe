@@ -8,7 +8,7 @@ Mistletoes or the group of plants in the genus Viscum are parasitic plants and g
 Likewise, mistletoe attaches objects on an existing object and those attached objects, provided there are no external references to them, share the life span with the host object.
 
 # Currently in Beta(Basic tests are done)$
-pub: https://pub.dartlang.org/packages/mitstletoe
+pub: https://pub.dartlang.org/packages/mistletoe
 home: https://github.com/TastyCatFood/mistletoe
 
 
