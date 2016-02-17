@@ -1,19 +1,54 @@
 part of mistletoe;
-/// Add properties and methods to objects.
+/// Adds properties and methods to objects.
 ///
 ///
-///     var d = new Dynamism();
+///     var d = new Dynamism(true);
 ///     var o = new Object();
 ///     d.on(o).add('say_hi',()=>print('hi you'));
 ///     d.on(o).say_hi();//prints: hi you
 ///     o = null;//removes everything
 class Dynamism {
+  ///var d = new Dynamism(true); to use.
+  ///
+  /// Never do:
+  ///
+  ///     var d = new Dynamism(true);
+  ///     var o = new Object();
+  ///     d.on(o).add('say_hi',()=>print('hi you'));
+  ///     var strong_reference = d.on(o);
+  ///     //and store strong_reference without using
+  ///
+  /// [on] method returns a [DynamicWrapper]
+  /// instance which contains a strong
+  /// reference to o. Once used it destroys
+  /// itself, but when stored unused, it keeps
+  /// o alive as a strong reference.
+  ///
+  /// Do:
+  ///     var d = new Dynamism(true);
+  ///     var o = new Object();
+  ///     d.on(o).add('say_hi',()=>print('hi you'));
+  ///     d.on(o).say_hay();
+  ///
+  Dynamism(bool expert){
+    if(!expert){
+      String msg = '[on] method returns a'
+          ' DynamicWrapper which is meant '
+          'to be used as a temporal; binding '
+          'an instance of DynamicWrapper to '
+          'a variable and never using it '
+          'creats a zombie objectPlease '
+          'that will not be garbage collected.'
+          ' Please read the documentation first';
+      throw msg;
+    }
+  }
   Mistletoe _am = new Mistletoe();
   ///Adds a dynamic property to
   ///an existing object.
   ///e.g.
   ///
-  ///     var d = new Dynamism();
+  ///     var d = new Dynamism(true);
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     d.on(o).say_hi();//prints: hi you
@@ -32,7 +67,7 @@ class Dynamism {
   ///
   /// e.g.
   ///
-  ///     var d = new Dynamism();
+  ///     var d = new Dynamism(true);
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     d.invoke(o,'say_hi');
@@ -44,7 +79,7 @@ class Dynamism {
     return on(object).call(f,args);
   }
 
-  ///Returns DynamicWrapper instance.
+  ///Returns a DynamicWrapper instance.
   ///Usage: adding or calling a dynamic
   ///property.
   ///
@@ -53,7 +88,7 @@ class Dynamism {
   ///temporal object
   ///e.g.
   ///
-  ///     var d = new Dynamism();
+  ///     var d = new Dynamism(true);
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     d.on(o).say_hi();//prints: hi you
@@ -61,18 +96,28 @@ class Dynamism {
   ///
   ///Pitfall:
   ///
-  ///     var strong_reference =
-  ///     d.on(o, allow_strong_reference:true);
+  /// Never do:
   ///
-  ///The above creates a strong reference
+  ///     var d = new Dynamism(true);
+  ///     var o = new Object();
+  ///     d.on(o).add('say_hi',()=>print('hi you'));
+  ///     var strong_reference = d.on(o);
+  ///     //and store strong_reference without using
   ///
-  ///     var later_created_reference = d.on(o);
+  /// [on] method returns a dynamic wrapper which contains a strong
+  /// reference to o. Once used it destroys itself, but when stored
+  /// unused, it keeps o alive as a strong reference.
   ///
-  ///The above creates a Future that deletes strong
-  ///references in the DynamicWrapper instance
+  /// Do:
+  ///     var d = new Dynamism(true);
+  ///     var o = new Object();
+  ///     d.on(o).add('say_hi',()=>print('hi you'));
+  ///     d.on(o).say_hay();
+  ///
+  ///
   DynamicWrapper on(var object, {bool allow_strong_reference:false}){
     return new DynamicWrapper(
-        object,_am,allow_strong_reference);
+        object,_am);
   }
 }
 class DynamicWrapper{
@@ -81,13 +126,8 @@ class DynamicWrapper{
   Mistletoe _awm;
   DynamicWrapper(
       this._key_object,
-      this._awm,
-      [bool allow_strong_reference=false]
-      ){
-    //todo consult someone if allow_strong_reference is worth the trouble
-    if(!allow_strong_reference)
-      new Future((){this._destroy();});
-  }
+      this._awm
+      ){ }
   add_method(
       String methodName,
       var newMethod){

@@ -4,7 +4,6 @@ library mistletoe;
 //DynamicWrapper objects get deleted and
 //does not create strong reference.
 //maybe not necessary but to be on the safe side.
-import 'dart:async';
 part 'dynamism.dart';
 
 ///A Weakmap variant
@@ -103,13 +102,9 @@ class Mistletoe{
       return k;
     }
     int length(context){
-      try {
-        return _map[context].length;
-      }on NoSuchMethodError catch(e){
-        return 0;
-      }catch(e){
-        rethrow;
-      }
+      var v = _map[context]?.length;
+      v ??= 0;
+      return v;
     }
 }
 

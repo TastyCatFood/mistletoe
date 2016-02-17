@@ -2,36 +2,22 @@ import 'mistletoe.dart';
 
 void main(){
 //sample code for demonstrating an application of Mistletoe
-  var m10 = new Mistletoe();
-  var o10 = new Object();
-  m10.add(o10,'hi',()=>print('hi'));
-  var key = new Object();
-  m10.add(o10,key,100);
-  m10.value(o10,'hi')();
-  print(m10.value(o10,key));
-  print(m10.keys(new Object()));
-  var map = {};
-  var no = new Object();
-  map[null] = 'yahooo';
-  print(map[null]);
+
   var m = new Mistletoe();
   var t = new DateTime.now();
-  //associating key and value on the context of t
-  // both key and value should be garbage collected once t has been garbage collected
-  m.add(
-      t,
-      'print time now',
-      () =>print(t));
+  // Associating key and value on the context of t
+  // both the key and the value should be garbage
+  // collected once t has been garbage collected.
+  m.add( t, 'print time now', () =>print(t));
 
-  // fetching all the keys that can be used to fetch
-  // values in the context of t
+  // getting keys store in m on the the context of t
   print(m.keys(t));
+  //accessing the stored value
   for (var k in m.keys(t)) {
     print(k.toString()); // 'print time now' will be printed
-    m.value(t, k)(); //value fetched is the function ()=>print(t)
+    m.value(t, k)(); //()=>print(t) is invoked
   }
-  //check the number of properties stored in the context of t on m.
-  print(m.get_length(t));
+  print(m.length(t));
   //now destroying all keys, values by destroying the context t
   t = null;
   //creating a partial copy of the Mistletoe m
@@ -61,7 +47,7 @@ void main(){
   //dynamic property sim
   m = new Object();
   print('=====dynamic property sim====');
-  var d = new Dynamism();
+  var d = new Dynamism(true);
   d.add_method(m,'hi',(){print('dynamically added hi');});
   d.invoke(m,'hi');
 

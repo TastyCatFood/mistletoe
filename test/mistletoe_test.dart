@@ -52,7 +52,7 @@ void main() {
 
     test('dynamic',(){
       m = new Object();
-      var d = new Dynamism();
+      var d = new Dynamism(true);
       d.add_method(m,'hi',(){return 'hi';});
       expect(d.invoke(m,'hi',[]),equals('hi'));
       d.add_method(m,'your_name_please',(name){return 'hi $name';});
@@ -61,7 +61,7 @@ void main() {
 
     test('dynamic wrapper',(){
       m = new Object();
-      var d = new Dynamism();
+      var d = new Dynamism(true);
       d.on(m).add_method('ask_age',(name,age){
         return 'hi ${name}, are you really $age?';
       });
