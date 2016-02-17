@@ -4,8 +4,8 @@ A weakmap variant.
 - Support pseudo dynamic addition of properties
 
 
-Mistletoes or the group of plants in the genus Viscum are parasitic and grow on another tree.
-Likewise, mistletoe grows objects on an existing object and those parasitic objects wither and are garbage collected when the host object has been garbage collected.
+Mistletoes or the group of plants in the genus Viscum are parasitic plants and grow on another tree.
+Likewise, mistletoe attaches objects on an existing object and those parasitic objects are garbage collected when the host object is garbage collected.
 
 # Currently in Beta(Basic tests are done)$
 
