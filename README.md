@@ -5,7 +5,7 @@ A weakmap variant.
 
 
 Mistletoes or the group of plants in the genus Viscum are parasitic plants and grow on another tree.
-Likewise, mistletoe attaches objects on an existing object and those parasitic objects are garbage collected when the host object is garbage collected.
+Likewise, mistletoe attaches objects on an existing object and attached objects share the life span with the host object provided there are no external references.
 
 # Currently in Beta(Basic tests are done)$
 
