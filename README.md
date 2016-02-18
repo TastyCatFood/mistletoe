@@ -11,6 +11,8 @@ A Weakmap variant. Expando on steroids.
             m.add( t, 'hi', 'bye');
             print(m.keys(t));//prints 'hi'
             print(m.value(t,'hi'));//prints bye; 
+            t = null;
+            //With t garbage collected, m is empty now
         }
 -  Supports pseudo dynamic addition of properties
 
@@ -21,6 +23,8 @@ A Weakmap variant. Expando on steroids.
             var o = new Object();
             d.on(o).greetings = ()=>print('hello world');
             d.on(o).greetings();//prints hello world
+            o = null;
+            //With o garbage collected, d is empty now. 
         }
     
     
