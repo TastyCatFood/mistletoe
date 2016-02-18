@@ -6,10 +6,16 @@ part of mistletoe;
 ///     var o = new Object();
 ///     d.on(o).add('say_hi',()=>print('hi you'));
 ///     d.on(o).say_hi();//prints: hi you
+///
+///     d.on(o).add('in_good_mood','Yap!');
+///     print(d.on(o).in_good_mood);//print Yap!
+///
+///     d.on(o).in_good_mood = 'No' ;
+///     print(d.on(o).in_good_mood);//prints no
 ///     o = null;//removes everything
 ///
 class Dynamism {
-  ///var d = new Dynamism(expert:true); to use.
+  /// var d = new Dynamism(expert:true); to use.
   ///
   /// Never do:
   ///
@@ -46,23 +52,47 @@ class Dynamism {
       throw msg;
     }
   }
-  Mistletoe _am = new Mistletoe();
+  Mistletoe _m = new Mistletoe();
   ///Adds a dynamic property to
-  ///an existing object.
+  ///an existing object. If a
+  ///property with the name already
+  ///exists, overwrites its value.
+  ///
   ///e.g.
   ///
   ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
   ///     d.on(o).add('say_hi',()=>print('hi you'));
   ///     d.on(o).say_hi();//prints: hi you
+  ///
+  ///     d.on(o).add('in_good_mood','Yap!');
+  ///     print(d.on(o).in_good_mood);//print Yap!
+  ///
+  ///     d.on(o).in_good_mood = 'No' ;
+  ///     print(d.on(o).in_good_mood);//prints no
   ///     o = null;//removes everything
   ///
-  add_method(
-      var targetObject,
-      String methodName,
-      var newMethod){
-    _am.add( targetObject, methodName,
-        newMethod);
+  void add_property(
+      var targetObject, String name,
+      var value){
+    _m.add( targetObject, name, value);
+  }
+  ///Same as add_property
+  void set_property_value(
+      var targetObject,String name,
+      var value
+      ){
+    _m.add( targetObject, name, value);
+  }
+  dynamic get_property_value(
+      var context, String name){
+    return _m.value(context,name);
+  }
+  List<String> methods( context ){
+    return on(context).methods();
+  }
+  List<String> properties(context){
+    return on(context).properties();
   }
   ///Invokes a dynamically added method.
   ///Unlike the [on] method, invoke takes
@@ -78,7 +108,7 @@ class Dynamism {
   ///
   dynamic invoke(var object, String method,
       [List args=null]) {
-    Function f = _am.value(object,method);
+    Function f = _m.value(object,method);
     args ??= [];
     return on(object).call(f,args);
   }
@@ -123,58 +153,83 @@ class Dynamism {
   ///     d.on(o).say_hay();
   ///
   ///
-  DynamicWrapper on(var object, {bool allow_strong_reference:false}){
+  DynamicWrapper on(var object){
     return new DynamicWrapper(
-        object,_am);
+        object,_m);
   }
 }
 class DynamicWrapper{
   var _key_object;
   bool _destroyed = false;
-  Mistletoe _awm;
+  Mistletoe _m;
   DynamicWrapper(
       this._key_object,
-      this._awm
+      this._m
       ){ }
-  add_method(
-      String methodName,
-      var newMethod){
-    _awm.add(
+  add_property(
+      String property_name,
+      var property){
+    _m.add(
         _key_object,
-        methodName,
-        newMethod);
+        property_name,
+        property);
     _destroy();
   }
+  ///Returns a list of all method names;
+  ///only functions.
   List<String> methods(){
     List keys = [];
-    for(var k in _awm.keys(_key_object))
+    for(var k in _m.keys(_key_object))
+      if(_m.value(_key_object,k) is Function)
+        keys.add(k.toString());
+    return keys;
+  }
+  ///Returns a list of all property names;
+  ///functions and attributes.
+  List<String> properties(){
+    List keys = [];
+    for(var k in _m.keys(_key_object))
       keys.add(k.toString());
     return keys;
   }
   _destroy(){
     _key_object = null;
-    _awm = null;
+    _m = null;
     _destroyed = true;
   }
-  noSuchMethod(Invocation invocation) {
+  noSuchMethod(Invocation inv) {
     if(_destroyed){
       String msg = 'DynamicWrapper reused error: '
           'Dynamism_instance.on(object) must be '
           'used as a temporal object';
       throw new StateError(msg);
     }
-    Symbol methodSymbol = invocation.memberName;
-    List args = invocation.positionalArguments;
-    Function f;
-    for(String k in _awm.keys(_key_object)){
-      Symbol s = new Symbol(k);
-      if(s == methodSymbol){
-        f = _awm.value(_key_object,k);
-        break;
-      }
+    //property or method name as a String
+    String pn = inv.memberName.toString();
+    //todo find a better method than substring
+    pn = pn.substring(8,pn.length-2);
+
+    List args = inv.positionalArguments;
+
+    // handling a setter call
+    // e.g.
+    //    d.on(o).greeting = 'guday';
+    if(pn[pn.length-1] == '='){
+      pn = pn.substring( 0,pn.length-1);
+      _m.add(_key_object,pn,args[0]);
+      _destroy();
+      return null;
     }
-    if(f == null) super.noSuchMethod(invocation);
-    return call(f,args);
+    //handling a getter or method call
+    var p = _m.value(_key_object,pn);
+    if(p == null) super.noSuchMethod(inv);
+    //property
+    if(p is! Function){
+      _destroy();
+      return p;
+    }
+    //function
+    return call(p,args);
   }
   call(Function f, List args){
     switch(args.length){

@@ -57,70 +57,79 @@ class Mistletoe{
     _map[context] ??= {};
     _map[context][key] = value;
   }
-  ///Returns keys that can be used with the
-  ///context to fetch values stored
-  ///in this Mistletoe instance on
-  ///the given context.
-  //todo see if ?.toList()is needed
-  keys(var context) => _map[context]?.keys;
 
-    ///returns the value saved on the
-    ///context with the key.
-    ///
-    /// e.g.
-    ///
-    ///     var m = new Mistletoe();
-    ///     var o = new Object();
-    ///     m.add(o,'hi',()=>print('hi'));
-    ///     var key = new Object();
-    ///     m.add(o,key,100);
-    ///     m.value(o,'hi')();
-    ///     //()=>print('hi'); gets called
-    ///
-    ///     print(m.value(o,key));
-    ///
-    ///
-    value(var context, var key){
-      Map m  =  _map[context];
-      m ??= {};
-      return m[key];
-    }
-    ///copy values and keys associated
-    ///with the contexts to a new
-    ///Mistletoe.
-    ///Deleting the original should not
-    ///affect the copy
-    partial_copy(List contexts){
-      var newMap = new Mistletoe();
-      for(var c in contexts) {
-        newMap._map[c] = {};
-        newMap._map[c].addAll(_map[c]);
+  ///Returns keys that can be used on
+  ///the context to fetch values stored
+  ///in this Mistletoe instance.
+  Iterable keys(var context) => _map[context]?.keys;
+
+  ///returns the value associated with
+  ///the key on the context. If either
+  ///no context or key is found, returns
+  ///null.
+  ///
+  /// e.g.
+  ///
+  ///     var m = new Mistletoe();
+  ///     var o = new Object();
+  ///     m.add(o,'hi',()=>print('hi'));
+  ///     var key = new Object();
+  ///     m.add(o,key,100);
+  ///     m.value(o,'hi')();
+  ///     //()=>print('hi'); gets called
+  ///
+  ///     print(m.value(o,key));
+  ///
+  ///
+  value(var context, var key){
+    Map m  =  _map[context];
+    m ??= {};
+    return m[key];
+  }
+  ///Creates a partial or full clone.
+  ///
+  ///The cloned contains keys and
+  ///values associated with the
+  ///provided contexts only.
+  ///
+  ///Deleting the original does not
+  ///affect the copy.
+  Mistletoe selective_clone(List contexts){
+    var newMap = new Mistletoe();
+    for(var c in contexts) {
+      newMap._map[c] = {};
+      newMap._map[c].addAll(_map[c]);
 //        for (var k in keys(c)) {
 //          newMap.add(c, k, value(c, k));
 //        }
-      }
-      return newMap;
     }
+    return newMap;
+  }
 
-    ///Returns a LinkedHashMap
-    ///
-    ///{key:value}
-    ///
-    ///The key value set is
-    ///removed from this instance
-    ///
-    Map pop(context,key){
-      var v = _map[context][key];
-      _map[context].remove(key);
-      return {key:v};
-    }
-    remove(context,key){
-      _map[context].remove(key);
-    }
-    int length(context){
-      var v = _map[context]?.length;
-      v ??= 0;
-      return v;
-    }
+  ///Returns a LinkedHashMap
+  ///
+  ///{key:value}
+  ///
+  ///The key value set on the
+  ///context is removed from this
+  ///instance of Mistletoe.
+  ///
+  Map pop(context,key){
+    var v = _map[context][key];
+    _map[context].remove(key);
+    return {key:v};
+  }
+
+  ///Removes the key and the value
+  ///associated with the key on the
+  ///context from this instance.
+  remove(context,key){
+    _map[context].remove(key);
+  }
+  int length(context){
+    var v = _map[context]?.length;
+    v ??= 0;
+    return v;
+  }
 }
 

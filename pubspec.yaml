@@ -1,6 +1,6 @@
 name: mistletoe
-description: A weakmap with keys method and support for dynamic addition of properties and their invocation.
-version: 0.0.1
+description: A Weakmap variant. Expando on steroids. Has keys method and support pseudo dynamic addition of properties.
+version: 0.0.3
 author: Hiroyuki Notomi <tastydart@gmail.com>
 homepage: https://github.com/TastyCatFood/mistletoe
 

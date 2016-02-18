@@ -1,14 +1,13 @@
-import 'package:mitstletoe/mistletoe.dart';
-
+import 'package:mistletoe/mistletoe.dart';
+// Sample code for demonstrating an application of Mistletoe.
 void main(){
-  //sample code for demonstrating an
-  // application of Mistletoe.
   var m = new Mistletoe();
   var t = new DateTime.now();
+
   // Associating the key 'print time now'
   // and the value ()=>print(t) on the context
   // of the object t; both the key and the value
-  // should be garbage collected once t has been
+  // should be garbage collected once t is
   // garbage collected.
   m.add( t, 'print time now', () =>print(t));
 
@@ -18,8 +17,13 @@ void main(){
   for (var k in m.keys(t)) {
     // 'print time now' will be printed
     print(k.toString());
-    //()=>print(t) is invoked
-    m.value(t, k)();
+    var p = m.value(t, k);
+    if(p is Function){
+      //()=>print(t) is invoked
+      print(p());
+    }else{
+      print(p);
+    }
   }
   // Find the number on values stored
   // on the context of t in m.
@@ -29,13 +33,16 @@ void main(){
   // the context t should be garbage
   // collected now.
   t = null;
-
-  // Copying
+  //copying
+  print('== m contains ==');
   t = new Object();
-  m.add(t, 'key one', ()=>print('key one'));
-  m.add(t, 'key two', ()=>print('key two'));
+  m.add(t, 'key one',
+      ()=>print('key one will not be copied'));
+  m.add(t, 'key two',
+      ()=>print('key two copied'));
+  for(var k in m.keys(t)) m.value(t,k)();
 
-  // copying only 'key two'
+  print('=== only key two copied to m2 === ');
   var m2 = new Mistletoe();
   for (var k in m.keys(t)){
     if(k.toString().contains('key two')){
@@ -44,49 +51,59 @@ void main(){
   }
   //Only key two copied
   for(var k in m2.keys(t)) {
-    print(k.toString());
     m2.value(t,k)();
   }
 
 
   //Dynamic property sim
-  m = new Object();
   print('=====dynamic property sim====');
+  // adding a property, getting and
+  // setting a value.
   var d = new Dynamism(expert:true);
-  d.add_method(m,'hi',(){
-    print('dynamically added hi called');});
-  d.invoke(m,'hi');
+  d.on(t).add_property(
+      't','fetched from a dynamically added property t');
+  print(d.get_property_value(t,'t'));
+  d.set_property_value(t,'t','I am the value of t now');
+  print(d.get_property_value(t,'t'));
 
-  // View all added methods
-  print(d.on(m).methods());
+  //Made easier with DynamicWrapper and [on]
+  d.on(t).test = 'I am set via '
+      '[on] method and [DynamicWrapper]';
+  print(d.on(t).test);
+  //adding a function
+  d.on(t).time_now = (){
+    print('current time is: ${new DateTime.now()}');};
+  d.on(t).time_now();
+  // Viewing added properties and functions
+  print('properties added on t in d: ${d.on(t).properties()}');
+  print('methods added on t in d: ${d.methods(t)}');
 
-  //More human friendly syntax
-  d.on(m).add_method('age_check',(name,age){
-    print('hi ${name}, are you really ${age}?' );
-  });
+  // passing parameters
+  d.on(m).age_check = (name, age){
+    print('Hi, I am a ${name}, ${age} years old.');
+  };
+  d.on(m).age_check('dog',5);
 
-  d.on(m).age_check('doggy',5);
-
-  // Never do the below
-  // The method on returns
-  // a DynamicWrapper which
+  // Never do the below.
+  // The method [on] returns
+  // a DynamicWrapper instance which
   // contains a strong reference.
-  // Once used, a DynamicWrapper
-  // destroys itself, but if stored
-  // will keep the wrapped object,
-  // in the case below m, alive.
   var wrapper = d.on(m);
+  // Calling a method or accessing a property
+  // in a DynamicWrapper instance, destroys
+  // the strong reference that exists within.
+  // But, binding a DynamicWrapper to a variable
+  // should not be done.
   wrapper.age_check('owl',0);
 
   //Have a function return something
-  d.on(m).add_method('let_me_sleep',(){
-    return 'you may sleep more than you wish for once the time comes ';
+  d.on(m).add_property('let_me_sleep',(){
+    return 'sleep later';
   });
   String msg = d.on(m).let_me_sleep();
-  print(msg);
+  print('The function let_me_sleep returned this string: ${msg}');
   // The below should throw an error.
   // A DynamicWapper object can only be
   // used once.
   //wrapper.bye('owl',0);
-
 }
