@@ -4,10 +4,10 @@ part of mistletoe;
 ///
 ///     var d = new Dynamism(expert:true);
 ///     var o = new Object();
-///     d.on(o).add('say_hi',()=>print('hi you'));
+///     d.on(o)say_hi = ()=>print('hi you');
 ///     d.on(o).say_hi();//prints: hi you
 ///
-///     d.on(o).add('in_good_mood','Yap!');
+///     d.on(o).in_good_mood = 'Yap!';
 ///     print(d.on(o).in_good_mood);//print Yap!
 ///
 ///     d.on(o).in_good_mood = 'No' ;
@@ -21,7 +21,7 @@ class Dynamism {
   ///
   ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
-  ///     d.on(o).add('say_hi',()=>print('hi you'));
+  ///     d.on(o).say_hi = ()=>print('hi you');
   ///     var strong_reference = d.on(o);
   ///     //Never store the variable
   ///     //strong_reference without using
@@ -36,7 +36,7 @@ class Dynamism {
   ///
   ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
-  ///     d.on(o).add('say_hi',()=>print('hi you'));
+  ///     d.on(o).add_property('say_hi',()=>print('hi you'));
   ///     d.on(o).say_hay();
   ///
   Dynamism({bool expert:false}){
@@ -48,7 +48,7 @@ class Dynamism {
           'a variable and never using it '
           'creats a zombie objectPlease '
           'that will not be garbage collected.'
-          ' Please read the documentation first';
+          ' Please read the readme first';
       throw msg;
     }
   }
@@ -62,10 +62,11 @@ class Dynamism {
   ///
   ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
-  ///     d.on(o).add('say_hi',()=>print('hi you'));
+  ///     d.on(o).add_property('say_hi',
+  ///       ()=>print('hi you'));
   ///     d.on(o).say_hi();//prints: hi you
   ///
-  ///     d.on(o).add('in_good_mood','Yap!');
+  ///     d.on(o).add_property('in_good_mood','Yap!');
   ///     print(d.on(o).in_good_mood);//print Yap!
   ///
   ///     d.on(o).in_good_mood = 'No' ;
@@ -95,7 +96,7 @@ class Dynamism {
     return on(context).properties();
   }
   ///Invokes a dynamically added method.
-  ///Unlike the [on] method, invoke takes
+  ///Unlike the [on] method, [invoke] takes
   ///the method name as a string, arguments
   ///as a list.
   ///
@@ -124,7 +125,7 @@ class Dynamism {
   ///
   ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
-  ///     d.on(o).add('say_hi',()=>print('hi you'));
+  ///     d.on(o).say_hi = ()=>print('hi you');
   ///     d.on(o).say_hi();//prints: hi you
   ///     o = null;//removes everything
   ///
@@ -134,7 +135,7 @@ class Dynamism {
   ///
   ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
-  ///     d.on(o).add('say_hi',()=>print('hi you'));
+  ///     d.on(o).say_hi = ()=>print('hi you');
   ///     var strong_reference = d.on(o);
   ///     //never store the variable
   ///     //strong_reference without using
@@ -149,7 +150,7 @@ class Dynamism {
   ///
   ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
-  ///     d.on(o).add('say_hi',()=>print('hi you'));
+  ///     d.on(o).say_hi = ()=>print('hi you');
   ///     d.on(o).say_hay();
   ///
   ///

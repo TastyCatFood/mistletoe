@@ -51,6 +51,21 @@ Do:
       //contains a strong reference  
       strong_reference.greetings();
       //now the strong reference in strong_reference is removed
+# Pros and Cons
+
+Pros:
+
+-  only 12.5kb(5kb or so without doc strings)
+-  Simple and small enough to read
+-  Does not depend on external packages
+-  Unlikely to break:
+Mistletoe depends on Expando and Map. DynamicWrapper depends on NoSuchMethod exception. Changes in these core parts of the dart language is possible but improbable.
+
+Cons:
+
+-  Dart analyzer does not support Dynamism
+-  No access to private members
+
 
 # Sample code:
 

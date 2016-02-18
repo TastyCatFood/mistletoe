@@ -6,25 +6,30 @@ library mistletoe;
 //maybe not necessary but to be on the safe side.
 part 'dynamism.dart';
 
-///A Weakmap variant
-///The lifespan of keys and values
-///depends on the lifespan of
-///the context object.
-///Mistletoe is a parasitic plant,
-///likewise Mistletoe objects grows new
-///objects on existing objects.
+///A Weakmap variant. Expando on steroids.
+///The lifespan of keys and values, provided
+///there are no external references to them,
+///depends on the lifespan of the context object.
+///
+///Mistletoe is a parasitic plant.
+///Likewise, Mistletoe instance
+///attaches objects on an existing
+///object.
 ///
 /// e.g.
 ///
 ///     var m = new Mistletoe();
 ///     var o = new Object();
+///
 ///     //o is a context object
 ///     m.add(o,'hi',()=>print('hi'));
 ///     var key = new Object();
 ///     m.add(o,key,100);
-///     m.value(o,'hi')();
-///     //()=>print('hi'); gets called
 ///
+///     //()=>print('hi'); gets called
+///     m.value(o,'hi')();
+///
+///     //prints 100
 ///     print(m.value(o,key));
 ///
 ///     o = null
@@ -35,8 +40,7 @@ part 'dynamism.dart';
 class Mistletoe{
   Expando _map = new Expando();
   ///Keys and values should be garbage collected
-  ///once their context object has been garbage
-  ///collected.
+  ///once their context object is garbage collected.
   /// e.g.
   ///
   ///     var m = new Mistletoe();
@@ -105,14 +109,14 @@ class Mistletoe{
     }
     return newMap;
   }
-
-  ///Returns a LinkedHashMap
+  ///Returns a LinkedHashMap.
   ///
   ///{key:value}
   ///
-  ///The key value set on the
-  ///context is removed from this
-  ///instance of Mistletoe.
+  ///Removes the key value set
+  ///stored on the context
+  ///from this instance of
+  ///Mistletoe.
   ///
   Map pop(context,key){
     var v = _map[context][key];
@@ -120,10 +124,11 @@ class Mistletoe{
     return {key:v};
   }
 
-  ///Removes the key and the value
-  ///associated with the key on the
-  ///context from this instance.
-  remove(context,key){
+  ///Removes the key value set
+  ///stored on the context
+  ///from this instance of
+  ///Mistletoe.
+  void remove(context,key){
     _map[context].remove(key);
   }
   int length(context){
