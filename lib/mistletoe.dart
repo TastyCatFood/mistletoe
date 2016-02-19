@@ -1,5 +1,4 @@
 library mistletoe;
-
 //async is used by DynamicWrapper to ensure
 //DynamicWrapper objects get deleted and
 //does not create strong reference.

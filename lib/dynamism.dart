@@ -1,4 +1,6 @@
 part of mistletoe;
+/// No-op method that is called to inform the compiler that unmangled named
+/// must be preserved.
 /// Adds properties and methods to objects.
 ///
 ///
@@ -15,6 +17,7 @@ part of mistletoe;
 ///     o = null;//removes everything
 ///
 class Dynamism {
+  Mistletoe _m = new Mistletoe();
   /// var d = new Dynamism(expert:true); to use.
   ///
   /// Never do:
@@ -52,7 +55,6 @@ class Dynamism {
       throw msg;
     }
   }
-  Mistletoe _m = new Mistletoe();
   ///Adds a dynamic property to
   ///an existing object. If a
   ///property with the name already
@@ -159,6 +161,7 @@ class Dynamism {
         object,_m);
   }
 }
+
 class DynamicWrapper{
   var _key_object;
   bool _destroyed = false;
@@ -206,16 +209,17 @@ class DynamicWrapper{
       throw new StateError(msg);
     }
     //property or method name as a String
+    //The name is transformed in minified js
+    //and toString prevents minification.
     String pn = inv.memberName.toString();
     //todo find a better method than substring
     pn = pn.substring(8,pn.length-2);
 
     List args = inv.positionalArguments;
-
     // handling a setter call
     // e.g.
     //    d.on(o).greeting = 'guday';
-    if(pn[pn.length-1] == '='){
+    if(inv.isSetter){
       pn = pn.substring( 0,pn.length-1);
       _m.add(_key_object,pn,args[0]);
       _destroy();

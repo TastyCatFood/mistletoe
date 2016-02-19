@@ -11,7 +11,7 @@ void main(){
   // garbage collected.
   m.add( t, 'print time now', () =>print(t));
 
-  // Getting keys store in m on the the context of t
+  // Getting keys stored in m on the the context of t
   print(m.keys(t));
   // Accessing the stored value
   for (var k in m.keys(t)) {
@@ -25,7 +25,7 @@ void main(){
       print(p);
     }
   }
-  // Find the number on values stored
+  // Find the number of values stored
   // on the context of t in m.
   print(m.length(t));
   // Destroying the context t.

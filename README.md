@@ -12,8 +12,9 @@ A Weakmap variant. Expando on steroids.
             print(m.keys(t));//prints 'hi'
             print(m.value(t,'hi'));//prints bye; 
             t = null;
-            //With t garbage collected, m is empty now
+            //With t garbage collected, m is empty now.
         }
+        
 -  Supports pseudo dynamic addition of properties
 
     
@@ -55,6 +56,25 @@ Do:
       //contains a strong reference  
       strong_reference.greetings();
       //now the strong reference in strong_reference is removed
+
+
+# A bug I'm currently working on
+
+When dart code is compiled into javascript code and minified, [on] method breaks.
+
+e.g.
+  
+     var d = new Dynamism();  
+     var o = new Object();
+     d.on(o).hi = 'You can't find me';
+     print(d.on(o).hi);
+     //Runs fine in console and dartium 
+     //but on chrome, when minified,
+     
+On chrome and with `minify:true` results in: `Uncaught NoSuchMethodError: method not found: 'gbz'`.  
+This bug only affects DynamicWrapper. There are two easy fixes, using Reflectable or dropping support in [methods] and [properties] methods for functions and properties set via [on] method. But I'm trying to find a way to turn off minify only for properties that are accessed with their name strings.  
+I'll fix this soon.
+
 # Pros and Cons
 
 Pros:
@@ -63,7 +83,7 @@ Pros:
 -  Simple and small enough to read
 -  Does not depend on external packages
 -  Unlikely to break:
-Mistletoe depends on Expando and Map. DynamicWrapper depends on NoSuchMethod exception. Changes in these core parts of the dart language is possible but improbable.
+Mistletoe depends on Expando and Map. DynamicWrapper depends on NoSuchMethod exception. Changes in these core parts of the dart language are possible but improbable.
 
 Cons:
 
@@ -87,7 +107,7 @@ Cons:
       // garbage collected.
       m.add( t, 'print time now', () =>print(t));
 
-      // Getting keys store in m on the the context of t
+      // Getting keys stored in m on the the context of t
       print(m.keys(t));
       // Accessing the stored value
       for (var k in m.keys(t)) {
@@ -99,7 +119,7 @@ Cons:
           print(p);
         }
       }
-      // Find the number on values stored
+      // Find the number of values stored
       // on the context of t in m.
       print(m.length(t));
       // Destroying the context t.
@@ -127,7 +147,6 @@ Cons:
       for(var k in m2.keys(t)) {
         m2.value(t,k)();
       }
-
 
       //Dynamic property sim
       print('=====dynamic property sim====');
@@ -157,7 +176,6 @@ Cons:
         print('Hi, I am a ${name}, ${age} years old.');
       };
       d.on(m).age_check('dog',5);
-
 
       //Have a function return something
       d.on(m).add_property('let_me_sleep',(){
