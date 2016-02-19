@@ -72,7 +72,7 @@ e.g.
      //but on chrome, when minified,
      
 On chrome and with `minify:true` results in: `Uncaught NoSuchMethodError: method not found: 'gbz'`.  
-This bug only affects DynamicWrapper. There are two easy fixes, using Reflectable or dropping support in [methods] and [properties] methods for functions and properties set via [on] method. But I'm trying to find a way to turn off minify only for properties that are accessed with their name strings.  
+This bug only affects DynamicWrapper. There are two easy fixes, using Reflectable and dropping support for properties set via [DynamicWrapper] in [properties] and [methods] name getters. But I'm trying to find a way to turn off minify only for properties that are accessed with their name strings.  
 I'll fix this soon.
 
 # Pros and Cons
