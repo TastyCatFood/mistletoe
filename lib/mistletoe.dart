@@ -1,9 +1,6 @@
 library mistletoe;
-//async is used by DynamicWrapper to ensure
-//DynamicWrapper objects get deleted and
-//does not create strong reference.
-//maybe not necessary but to be on the safe side.
 part 'dynamism.dart';
+
 
 ///A Weakmap variant. Expando on steroids.
 ///The lifespan of keys and values, provided

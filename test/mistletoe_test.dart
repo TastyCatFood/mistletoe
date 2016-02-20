@@ -1,6 +1,3 @@
-// Copyright (c) 2016, <your name>. All rights reserved. Use of this source code
-// is governed by a BSD-style license that can be found in the LICENSE file.
-
 library mistletoe.test;
 
 import '../lib/mistletoe.dart';
@@ -95,19 +92,11 @@ void main() {
       expect(m2.value(o2,t)(),equals(5));
     });
 
-    test('dynamic method addition and calls',(){
-      m = new Object();
-      var d = new Dynamism(expert:true);
-      d.add_property(m,'hi',(){return 'hi';});
-      expect(d.invoke(m,'hi',[]),equals('hi'));
-      d.add_property(m,'your_name_please',(name){return 'hi $name';});
-      expect(d.invoke(m,'your_name_please',['owl']),equals('hi owl'));
-    });
 
-    test('dynamic wrapper method addition and calls',(){
+    test('DynamicWrapper method addition and calls',(){
       m = new Object();
       var d = new Dynamism(expert:true);
-      d.on(m).add_property('ask_age',(name,age){
+      d.on(m).set('ask_age',(name,age){
         return 'hi ${name}, are you really $age?';
       });
       expect(d.on(m).methods(),equals(['ask_age']));
@@ -118,11 +107,11 @@ void main() {
           equals('hi owl, are you really 0?'));
 //      expect(wrapper.ask_age('owl',0),throwsA(StateError));
     });
-    test('dynamic wrapper property addition, '
+    test('DynamicWrapper property addition, '
         ' getter and setter',(){
       var t = new Object();
       var dy = new Dynamism(expert:true);
-      dy.on(t).add_property('te','hi');
+      dy.on(t).set('te','hi');
       expect(dy.on(t).te,equals('hi'));
       dy.on(t).te = 'changed from hi to bye';
       expect(dy.on(t).te,equals('changed from hi to bye'));
@@ -140,19 +129,19 @@ void main() {
       expect(m.length(o),equals(0));
       expect(map['over'], equals(o2));
     });
-    test('Dynamic::get_property_value',(){
+    test('Dynamic::get',(){
       var dy = new Dynamism(expert:true);
-      dy.add_property(o,'te','hi');
-      expect(dy.get_property_value(o,'te'),
+      dy.on(o).set('te','hi');
+      expect(dy.on(o).get('te'),
           equals('hi'));
     });
 
     test('Dynamic::methods',(){
       var dy = new Dynamism(expert:true);
-      dy.add_property(o,'te','hi');
-      dy.add_property(o,'strong',()=>'I am');
-      dy.add_property(o,'weak',()=>'maybe');
-      expect(dy.methods(o),equals(['strong','weak']));
+      dy.on(o).set('te','hi');
+      dy.on(o).set('strong',()=>'I am');
+      dy.on(o).set('weak',()=>'maybe');
+      expect(dy.on(o).methods(),equals(['strong','weak']));
     });
 
   });

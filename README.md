@@ -1,6 +1,8 @@
 # Mistletoe and Dynamism
 A Weakmap variant. Expando on steroids. 
 
+
+
 -  Has keys method
         
         
@@ -17,13 +19,13 @@ A Weakmap variant. Expando on steroids.
         
 -  Supports pseudo dynamic addition of properties
 
-    
         import 'package:mistletoe/mistletoe.dart';
         Dynamism d = new Dynamism(expert:true);
         void main(){
             var o = new Object();
-            d.on(o).greetings = ()=>print('hello world');
-            d.on(o).greetings();//prints hello world
+            d.on(o).set('greetings',()=>print('hello world'));
+            d.on(o).methods(); //returns ['greetings']
+            d.on(o).invoke('greetings');//prints hello world
             o = null;
             //With o garbage collected, d is empty now. 
         }
@@ -32,9 +34,29 @@ A Weakmap variant. Expando on steroids.
 Mistletoes or the group of plants in the genus Viscum are parasitic and grow on another tree.
 Likewise, Mistletoe attaches objects on an existing object and those attached objects, provided there are no external references to them, share the lifespan with the host object.
 
-# Currently looking for brave testers 
+## Known Issue
 
-pub: https://pub.dartlang.org/packages/mistletoe
+-  When `minify:true`, assigning properties with `=` breaks code. 
+    
+        import 'package:mistletoe/mistletoe.dart';
+        Dynamism d = new Dynamism(expert:true);
+        void main(){
+            var o = new Object();
+            d.on(o).greetings = ()=>print('hello world');
+            d.on(o).greetings();//prints hello world
+        }
+    
+There is no known easy fix. I'm currently planning to write a transformer that converts `d.on(e).greetings = 'hi'` to `do.on(o).set('greetings','hi')` before dart2js compiles the code.
+
+## Changes in v1.0.0
+-  Redundant methods removed.  
+-  Some methods renamed.
+   
+
+## Status
+Currently looking for brave testers 
+
+pub: https://pub.dartlang.org/packages/mistletoe  
 home: https://github.com/TastyCatFood/mistletoe
 
 # Warning!
@@ -42,101 +64,91 @@ home: https://github.com/TastyCatFood/mistletoe
 Never do:
 
     var o = new Object();
-    d.on(o).greetings = ()=>print('hello world');
+    d.on(o).set('greetings',()=>print('hello world'));
     var strong_reference = d.on(o);
 
 Do:
 
     var o = new Object();
-    d.on(o).greetings = ()=>print('hello world');
-    d.on(o).greetings();//prints hello world
+    d.on(o).set('greetings',()=>print('hello world'));
+    d.on(o).invoke('greetings');//prints hello world
       
-[on] method returns a DynamicWrapper which contains a strong reference. If stored unused, it prevents the garbage collection of the referent. Once used as in the below, the strong reference in a DynamicWrapper is destroyed.
+[on] method returns a DynamicWrapper which contains a strong reference; in the case above, to the object o. If stored unused, it prevents the garbage collection of the referent. Once used, the strong reference is destroyed.
 
       //contains a strong reference  
-      strong_reference.greetings();
+      strong_reference.invoke('greetings');
       //now the strong reference in strong_reference is removed
 
-
-# A bug I'm currently working on
-
-When dart code is compiled into javascript code and minified, [on] method breaks.
-
-e.g.
-  
-     var d = new Dynamism();  
-     var o = new Object();
-     d.on(o).hi = 'You can't find me';
-     print(d.on(o).hi);
-     //Runs fine in console and dartium 
-     //but on chrome, when minified,
-     
-On chrome and with `minify:true` results in: `Uncaught NoSuchMethodError: method not found: 'gbz'`.  
-This bug only affects DynamicWrapper. There are two easy fixes, using Reflectable and dropping support for properties set via [DynamicWrapper] in [properties] and [methods] name getters. But I'm trying to find a way to turn off minify only for properties that are accessed with their name strings.  
-I'll fix this soon.
 
 # Pros and Cons
 
 Pros:
 
--  only 12.5kb(5kb or so without doc strings)
--  Simple and small enough to read
+-  Small  
+The following code is 5.9KB when sent to dartium, 13.7KB on chrome with `minify:true`.  
+
+        import 'package:mistletoe/mistletoe.dart';
+        var d  = new Dynamism(expert:true);
+        void main(){
+         var e = new Object();
+         d.on(e).set('greetings', 'hi from mistletoe');
+         print(d.on(e).get('greetings'));
+        }
+ 
+-  Simple enough to read and tinker
 -  Does not depend on external packages
--  Unlikely to break:
-Mistletoe depends on Expando and Map. DynamicWrapper depends on NoSuchMethod exception. Changes in these core parts of the dart language are possible but improbable.
+-  Strings are unaffected by name mangling. Get them via [properties]
+-  Unlikely to break. Drastic changes in Expando and Map are unlikely.
+-  Does not modify your existing classes or objects.
 
 Cons:
-
--  Dart analyzer does not support Dynamism
+-  Without `=` operator, not very readable
 -  No access to private members
 
 
 # Sample code:
 
     import 'package:mistletoe/mistletoe.dart';
-
     // Sample code for demonstrating an application of Mistletoe.
     void main(){
       var m = new Mistletoe();
       var t = new DateTime.now();
 
-      // Associating the key 'print time now'
-      // and the value ()=>print(t) on the context
-      // of the object t; both the key and the value
+      // Both 'print time now' and ()=>print(t))
       // should be garbage collected once t is
       // garbage collected.
       m.add( t, 'print time now', () =>print(t));
+      m.add( t, 'time to go', 'no');
 
-      // Getting keys stored in m on the the context of t
-      print(m.keys(t));
-      // Accessing the stored value
+      // Getting keys stored in m on the the context t.
+      print(m.keys(t)); //prints (print time now, time to go)
+
+      // Getting the values
       for (var k in m.keys(t)) {
+        // 'print time now' will be printed
+        print(k.toString());
         var p = m.value(t, k);
         if(p is Function){
-        //()=>print(t) is invoked
+          //()=>print(t) is invoked
           print(p());
         }else{
-          print(p);
+          print(p); //prints no
         }
       }
-      // Find the number of values stored
-      // on the context of t in m.
+      //How many keys on the context t?
       print(m.length(t));
+
       // Destroying the context t.
       // All keys, values in m stored on
       // the context t should be garbage
       // collected now.
       t = null;
-      //copying
-      print('== m contains ==');
-      t = new Object();
-      m.add(t, 'key one',
-          ()=>print('key one will not be copied'));
-      m.add(t, 'key two',
-          ()=>print('key two copied'));
-      for(var k in m.keys(t)) m.value(t,k)();
 
-      print('=== only key two copied to m2 === ');
+      //copying
+      t = new Object();
+      m.add(t, 'key one', ()=>print('key one will not be copied'));
+      m.add(t, 'key two', ()=>print('key two copied'));
+
       var m2 = new Mistletoe();
       for (var k in m.keys(t)){
         if(k.toString().contains('key two')){
@@ -144,47 +156,51 @@ Cons:
         }
       }
       //Only key two copied
+      print('The new Mistletoe m2 only has:');
       for(var k in m2.keys(t)) {
         m2.value(t,k)();
       }
 
-      //Dynamic property sim
-      print('=====dynamic property sim====');
-      // adding a property, getting and
-      // setting a value.
+      print('=== Dynamism====');
       var d = new Dynamism(expert:true);
-      d.on(t).add_property(
-          't','fetched from a dynamically added property t');
-      print(d.get_property_value(t,'t'));
-      d.set_property_value(t,'t','I am the value of t now');
-      print(d.get_property_value(t,'t'));
+      d.on(t).set('t','fetched from a dynamically set property t');
+      print(d.on(t).get('t'));
+      d.on(t).set('t','I am the value of t now');
+      print(d.on(t).get('t'));
 
-      //Made easier with DynamicWrapper and [on]
-      d.on(t).test = 'I am set via '
-          '[on] method and [DynamicWrapper]';
-      print(d.on(t).test);
-      //adding a function
-      d.on(t).time_now = (){
-        print('current time is: ${new DateTime.now()}');};
-      d.on(t).time_now();
+      // Adding and calling a function
+      d.on(t).set('time_now',
+          (){ print('current time is: ${new DateTime.now()}');});
+      d.on(t).invoke('time_now');
+
       // Viewing added properties and functions
       print('properties added on t in d: ${d.on(t).properties()}');
-      print('methods added on t in d: ${d.methods(t)}');
+      print('methods added on t in d: ${d.on(t).methods()}');
 
-      // passing parameters 
-      d.on(m).age_check = (name, age){
+      // passing parameters a function
+      d.on(m).set('age_check',(name, age){
         print('Hi, I am a ${name}, ${age} years old.');
-      };
-      d.on(m).age_check('dog',5);
+      });
+      d.on(m).invoke('age_check',['dog',5]);
+
+      // Never do the below.
+      // The method [on] returns  a DynamicWrapper
+      // instance which  contains a strong reference.
+      var wrapper = d.on(m);
+      // Using as in the below remove the strong
+      // reference to allow garbage collection.
+      wrapper.age_check('owl',0);
+
+      // An attempt to reuse a DynamicWrapper
+      // throws throws an error.
+      //wrapper.bye('owl',0);
 
       //Have a function return something
-      d.on(m).add_property('let_me_sleep',(){
-        return 'sleep later';
-      });
-      String msg = d.on(m).let_me_sleep();
+      d.on(m).set('let_me_sleep',(){ return 'sleep later'; });
+      String msg = d.on(m).invoke('let_me_sleep');
       print('The function let_me_sleep returned this string: ${msg}');
-      // The below should throw an error.
-      // A DynamicWapper object can only be
-      // used once.
-      //wrapper.bye('owl',0);
+
+      //The bellow currently breaks when `minify:true`
+      d.on(t).time_now = (){ print('current time is: ${new DateTime.now()}');};
+      d.on(t).time_now();
     }

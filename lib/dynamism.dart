@@ -1,20 +1,31 @@
 part of mistletoe;
-/// No-op method that is called to inform the compiler that unmangled named
-/// must be preserved.
-/// Adds properties and methods to objects.
+/// Store values on mistletoe using objects as keys.
 ///
 ///
 ///     var d = new Dynamism(expert:true);
 ///     var o = new Object();
-///     d.on(o)say_hi = ()=>print('hi you');
-///     d.on(o).say_hi();//prints: hi you
+///     d.on(o).set('say_hi',
+///       (name)=>print('hi you $name'));
+///     d.on(o).invoke('say_hi',['you']);//prints: hi you
 ///
-///     d.on(o).in_good_mood = 'Yap!';
-///     print(d.on(o).in_good_mood);//print Yap!
+///     d.on(o).set('in_good_mood', 'Yap!');
+///     print(d.on(o).value('in_good_mood'));//print Yap!
 ///
-///     d.on(o).in_good_mood = 'No' ;
+///     d.on(o).set('in_good_mood','No') ;
 ///     print(d.on(o).in_good_mood);//prints no
 ///     o = null;//removes everything
+///
+///    //Due to the limitations of dart2js
+///    //the following syntax does not work
+///    //when dart code is compiled into
+///    //javascript and minified.
+///
+///    //adding and setting a new property
+///    d.on(o).bye = 'Not so soon';
+///
+///    //prints Not so soon
+///    print(d.on(e).bye);
+///
 ///
 class Dynamism {
   Mistletoe _m = new Mistletoe();
@@ -24,23 +35,23 @@ class Dynamism {
   ///
   ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
-  ///     d.on(o).say_hi = ()=>print('hi you');
+  ///     d.on(o).set('say_hi'),()=>print('hi you'));
   ///     var strong_reference = d.on(o);
-  ///     //Never store the variable
-  ///     //strong_reference without using
   ///
-  /// [on] method returns a [DynamicWrapper]
-  /// instance which contains a strong
-  /// reference to o. Once used it destroys
-  /// itself, but when stored unused, it keeps
-  /// the object o alive as a strong reference.
+  /// [on] method returns a dynamic wrapper
+  /// which contains a strong reference.
+  /// Once used, the strong reference is removed
+  /// to allow the garbage collection of the
+  /// referent to happen.
   ///
   /// Do:
   ///
   ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
-  ///     d.on(o).add_property('say_hi',()=>print('hi you'));
-  ///     d.on(o).say_hay();
+  ///     d.on(o)set('say_hi',
+  ///       (name)=>print('hi $name'));
+  ///     d.on(o).invoke('say_hi',[doggy]);
+  ///
   ///
   Dynamism({bool expert:false}){
     if(!expert){
@@ -55,70 +66,10 @@ class Dynamism {
       throw msg;
     }
   }
-  ///Adds a dynamic property to
-  ///an existing object. If a
-  ///property with the name already
-  ///exists, overwrites its value.
-  ///
-  ///e.g.
-  ///
-  ///     var d = new Dynamism(expert:true);
-  ///     var o = new Object();
-  ///     d.on(o).add_property('say_hi',
-  ///       ()=>print('hi you'));
-  ///     d.on(o).say_hi();//prints: hi you
-  ///
-  ///     d.on(o).add_property('in_good_mood','Yap!');
-  ///     print(d.on(o).in_good_mood);//print Yap!
-  ///
-  ///     d.on(o).in_good_mood = 'No' ;
-  ///     print(d.on(o).in_good_mood);//prints no
-  ///     o = null;//removes everything
-  ///
-  void add_property(
-      var targetObject, String name,
-      var value){
-    _m.add( targetObject, name, value);
-  }
-  ///Same as add_property
-  void set_property_value(
-      var targetObject,String name,
-      var value
-      ){
-    _m.add( targetObject, name, value);
-  }
-  dynamic get_property_value(
-      var context, String name){
-    return _m.value(context,name);
-  }
-  List<String> methods( context ){
-    return on(context).methods();
-  }
-  List<String> properties(context){
-    return on(context).properties();
-  }
-  ///Invokes a dynamically added method.
-  ///Unlike the [on] method, [invoke] takes
-  ///the method name as a string, arguments
-  ///as a list.
-  ///
-  /// e.g.
-  ///
-  ///     var d = new Dynamism(expert:true);
-  ///     var o = new Object();
-  ///     d.on(o).add('say_hi',()=>print('hi you'));
-  ///     d.invoke(o,'say_hi');
-  ///
-  dynamic invoke(var object, String method,
-      [List args=null]) {
-    Function f = _m.value(object,method);
-    args ??= [];
-    return on(object).call(f,args);
-  }
 
   ///Returns a DynamicWrapper instance.
-  ///Usage: adding or calling a dynamic
-  ///property.
+  ///Usage: setting, getting or invoking
+  ///a dynamic property.
   ///
   ///The return value object of this
   ///method should be used only as a
@@ -127,8 +78,8 @@ class Dynamism {
   ///
   ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
-  ///     d.on(o).say_hi = ()=>print('hi you');
-  ///     d.on(o).say_hi();//prints: hi you
+  ///     d.on(o).set('say_hi'),(name)=>print('hi $name'));
+  ///     d.on(o).invoke('say_hi',['doggy']);//prints: hi doggy
   ///     o = null;//removes everything
   ///
   ///Pitfall:
@@ -137,23 +88,22 @@ class Dynamism {
   ///
   ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
-  ///     d.on(o).say_hi = ()=>print('hi you');
+  ///     d.on(o).set('say_hi'),()=>print('hi you'));
   ///     var strong_reference = d.on(o);
-  ///     //never store the variable
-  ///     //strong_reference without using
   ///
   /// [on] method returns a dynamic wrapper
-  /// which contains a strong reference to o.
-  /// Once used it destroys itself, but when stored
-  /// unused, tt keeps the object o alive as a strong
-  /// reference.
+  /// which contains a strong reference.
+  /// Once used, the strong reference is removed
+  /// to allow the garbage collection of the
+  /// referent to happen.
   ///
   /// Do:
   ///
   ///     var d = new Dynamism(expert:true);
   ///     var o = new Object();
-  ///     d.on(o).say_hi = ()=>print('hi you');
-  ///     d.on(o).say_hay();
+  ///     d.on(o)set('say_hi',
+  ///       (name)=>print('hi $name'));
+  ///     d.on(o).invoke('say_hi',[doggy]);
   ///
   ///
   DynamicWrapper on(var object){
@@ -161,7 +111,7 @@ class Dynamism {
         object,_m);
   }
 }
-
+@proxy
 class DynamicWrapper{
   var _key_object;
   bool _destroyed = false;
@@ -170,14 +120,44 @@ class DynamicWrapper{
       this._key_object,
       this._m
       ){ }
-  add_property(
+  ///Adds and sets a property value
+  ///e.g.
+  ///
+  ///   var d = new Dynamism(expert:true);
+  ///   var o = new Object();
+  ///   d.on(o).set(
+  ///     'morning_greeting', 'good morning');
+  ///
+  ///   //returns good morning
+  ///   print(d.on(o).get('morning_greeting'));
+  ///
+  void set(
       String property_name,
-      var property){
+      var value
+      ){
     _m.add(
         _key_object,
         property_name,
-        property);
+        value );
     _destroy();
+  }
+  ///Fetches the value of a property
+  ///e.g.
+  ///
+  ///   var d = new Dynamism(expert:true);
+  ///   var o = new Object();
+  ///   d.on(o).set('morning_greeting',
+  ///     'good morning');
+  ///
+  ///   //returns good morning
+  ///   print(d.on(o).value('morning_greeting'))
+  ///
+  ///If the property does not exit, returns null
+  ///todo test
+  dynamic get(String propertyName){
+    var v = _m.value(_key_object,propertyName);
+    _destroy();
+    return v;
   }
   ///Returns a list of all method names;
   ///only functions.
@@ -191,16 +171,17 @@ class DynamicWrapper{
   ///Returns a list of all property names;
   ///functions and attributes.
   List<String> properties(){
-    List keys = [];
-    for(var k in _m.keys(_key_object))
-      keys.add(k.toString());
-    return keys;
+    return _m.keys(_key_object).toList();
   }
   _destroy(){
     _key_object = null;
     _m = null;
     _destroyed = true;
   }
+  ///Handles dynamic addition of properties
+  ///but `minify:true` currently breaks
+  ///this.
+  ///todo write a transformer to solve this.
   noSuchMethod(Invocation inv) {
     if(_destroyed){
       String msg = 'DynamicWrapper reused error: '
@@ -209,16 +190,11 @@ class DynamicWrapper{
       throw new StateError(msg);
     }
     //property or method name as a String
-    //The name is transformed in minified js
-    //and toString prevents minification.
+    //breaks once code gets minified.
     String pn = inv.memberName.toString();
-    //todo find a better method than substring
     pn = pn.substring(8,pn.length-2);
-
     List args = inv.positionalArguments;
-    // handling a setter call
-    // e.g.
-    //    d.on(o).greeting = 'guday';
+    // Handling a setter call
     if(inv.isSetter){
       pn = pn.substring( 0,pn.length-1);
       _m.add(_key_object,pn,args[0]);
@@ -236,7 +212,30 @@ class DynamicWrapper{
     //function
     return call(p,args);
   }
-  call(Function f, List args){
+  ///Invokes the value of a property
+  ///e.g.
+  ///
+  ///   var d = new Dynamism(expert:true);
+  ///   var o = new Object();
+  ///   d.on(o).set(
+  ///     'morning_greeting',
+  ///     (name)=>print('good morning ${name}!'));
+  ///
+  ///   //prints good morning doggy!
+  ///   d.on(o).invoke('morning_greeting',['doggy']);
+  ///
+  dynamic invoke(String methodName,
+      [List args = const []]){
+    Function f = _m.value(_key_object,methodName);
+    if(f is! Function){
+      String msg = 'A function with the name '
+          '$methodName has not been set in '
+          'Dynamism yet.';
+      throw new ArgumentError.value(methodName,msg);
+    }
+    return call(f,args);
+  }
+  call(Function f, [List args = const []]){
     switch(args.length){
       case 0:
         var r = f();
