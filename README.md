@@ -56,7 +56,7 @@ There is no known easy fix. I'm currently planning to write a transformer that c
 ## Status
 Currently looking for brave testers 
 
-pub: https://pub.dartlang.org/packages/mistletoe  
+pub: https://pub.dartlang.org/packages/mistletoe    
 home: https://github.com/TastyCatFood/mistletoe
 
 # Warning!
@@ -102,6 +102,7 @@ The following code is 5.9KB when sent to dartium, 13.7KB on chrome with `minify:
 -  Does not modify your existing classes or objects.
 
 Cons:
+
 -  Without `=` operator, not very readable
 -  No access to private members
 

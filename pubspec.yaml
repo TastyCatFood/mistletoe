@@ -1,16 +1,21 @@
 name: mistletoe
 description: A Weakmap variant. Expando on steroids. Has keys method and support pseudo dynamic addition of properties.
-version: 1.0.0
+version: 1.0.1
 author: Hiroyuki Notomi <tastydart@gmail.com>
 homepage: https://github.com/TastyCatFood/mistletoe
 
 environment:
   sdk: '>=1.0.0 <2.0.0'
-
+dependencies:
+  mutator: any
+#  mutator:
+#    path: /home/d/Dropbox/IdeaProjects/mutator
 dev_dependencies:
   test: "^0.12.10+2"
   browser: any
+  barback: any
 
-#transformers:
-#- $dart2js:
-#    minify: true
+transformers:
+- mistletoe
+- $dart2js:
+    minify: true
