@@ -1,11 +1,8 @@
 # Mistletoe and Dynamism
 A Weakmap variant. Expando on steroids. 
 
-
-
 -  Has keys method
-        
-        
+
         import 'package:mistletoe/mistletoe.dart';
         void main(){
             var m = new Mistletoe();
@@ -14,7 +11,7 @@ A Weakmap variant. Expando on steroids.
             print(m.keys(t));//prints 'hi'
             print(m.value(t,'hi'));//prints bye; 
             t = null;
-            //With t garbage collected, m is empty now.
+            //With t garbage collected, m is now empty.
         }
         
 -  Supports pseudo dynamic addition of properties
@@ -26,6 +23,10 @@ A Weakmap variant. Expando on steroids.
             d.on(o).set('greetings',()=>print('hello world'));
             d.on(o).methods(); //returns ['greetings']
             d.on(o).invoke('greetings');//prints hello world
+
+            //Or with the use of the mistletoe transformer or if the code is not compiled into javascript.
+            d.on(o).greetings = ()=>print('hello world');
+            d.on(o).greetings();//prints hello world
             o = null;
             //With o garbage collected, d is empty now. 
         }
@@ -36,28 +37,78 @@ Likewise, Mistletoe attaches objects on an existing object and those attached ob
 
 ## Known Issue
 
--  When `minify:true`, assigning properties with `=` breaks code. 
+####  When `minify:true` is set, assigning properties with `=` or calling a dynamically added method breaks the code.
+
     
         import 'package:mistletoe/mistletoe.dart';
         Dynamism d = new Dynamism(expert:true);
         void main(){
             var o = new Object();
+            // Does not work
             d.on(o).greetings = ()=>print('hello world');
             d.on(o).greetings();//prints hello world
         }
-    
-There is no known easy fix. I'm currently planning to write a transformer that converts `d.on(e).greetings = 'hi'` to `do.on(o).set('greetings','hi')` before dart2js compiles the code.
+####  Solution
+   Use the mistletoe transformer, add `- mistletoe` to pubspec.yaml as below:
+
+        transformers:
+        - mistletoe
+
+   Transformer adds the following compile time dependencies:
+
+          mutator: '>=0.0.2'
+          barback: '>=0.15.2+7'
+
+   ####Limitations of the transformer
+   The transformer relies on: https://github.com/TastyCatFood/mutator and shares its limitations.
+   +  Cannot refactor dynamically typed objects:
+
+            f(d,e){
+                //The type of d is not known, so mistletoe transformer cannot handle the below.
+                return d.on(e).hi();
+            }
+        Do:
+
+            if(d is Dynamism){
+                d = d as dynamism;
+                return d.on(e).hi();
+            }
+            //Or
+            f(Dynamism d,e)=>d.on(e).hi();
+
+   +   Cannot be chained or nested:
+
+            var d = new Dynamism(expert:true);
+            var e = new Object();
+            d.on(e).dyna = new Dynamism(expert:true);
+            //mistletoe transformer cannot guess the type of dyna
+            d.on(e).dyna.on(d).hi = 'hi';
+
+   +  Function's return value type is currently ignored:
+
+            var dyna = new Dynamism(expert:true);
+            Dynamism f()=> dyna;
+            main(){
+                var d = f();// mistletoe transformer fails to detect type of d.
+                var o = new Object();
+                d.on(o).hi = 'hi';// refactoring fails.
+                f().on(o).hi = 'hi' //refactoring fails.
+            }
+        Do: `Dynamism d = f();` and never do `f().on(o).hi = 'hi'`.
+
 
 ## Changes in v1.0.0
 -  Redundant methods removed.  
 -  Some methods renamed.
+## Changes in v1.0.1
+-  Transformer added.
    
 
 ## Status
-Currently looking for brave testers 
-
-pub: https://pub.dartlang.org/packages/mistletoe    
+Have not been exhaustively tested. Transformer is not fail safe.
+pub: https://pub.dartlang.org/packages/mistletoe
 home: https://github.com/TastyCatFood/mistletoe
+
 
 # Warning!
 
@@ -65,7 +116,7 @@ Never do:
 
     var o = new Object();
     d.on(o).set('greetings',()=>print('hello world'));
-    var strong_reference = d.on(o);
+    var strong_reference = d.on(o);// bad
 
 Do:
 
@@ -85,25 +136,16 @@ Do:
 Pros:
 
 -  Small  
-The following code is 5.9KB when sent to dartium, 13.7KB on chrome with `minify:true`.  
-
-        import 'package:mistletoe/mistletoe.dart';
-        var d  = new Dynamism(expert:true);
-        void main(){
-         var e = new Object();
-         d.on(e).set('greetings', 'hi from mistletoe');
-         print(d.on(e).get('greetings'));
-        }
- 
 -  Simple enough to read and tinker
--  Does not depend on external packages
+-  Does not depend on external packages on run time.
 -  Strings are unaffected by name mangling. Get them via [properties]
--  Unlikely to break. Drastic changes in Expando and Map are unlikely.
+-  Unlikely to break. Drastic changes in either Expando or Map is unlikely.
 -  Does not modify your existing classes or objects.
 
 Cons:
 
--  Without `=` operator, not very readable
+-  Without assignment operator `=` support,  code can be unreable.
+-  Transformer has its limitations.
 -  No access to private members
 
 
@@ -201,7 +243,7 @@ Cons:
       String msg = d.on(m).invoke('let_me_sleep');
       print('The function let_me_sleep returned this string: ${msg}');
 
-      //The bellow currently breaks when `minify:true`
+      //The bellow currently breaks when `minify:true` without the use of mistletoe transformer.
       d.on(t).time_now = (){ print('current time is: ${new DateTime.now()}');};
       d.on(t).time_now();
     }

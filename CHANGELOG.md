@@ -14,5 +14,4 @@
 
 ## 1.0.1
 -  Transformer added.
--  Mutator added.
 

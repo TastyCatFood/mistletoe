@@ -7,13 +7,13 @@ homepage: https://github.com/TastyCatFood/mistletoe
 environment:
   sdk: '>=1.0.0 <2.0.0'
 dependencies:
-  mutator: any
+  mutator: '>=0.0.2'
+  barback: '>=0.15.2+7'
 #  mutator:
 #    path: /home/d/Dropbox/IdeaProjects/mutator
 dev_dependencies:
   test: "^0.12.10+2"
   browser: any
-  barback: any
 
 transformers:
 - mistletoe
