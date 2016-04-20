@@ -59,7 +59,8 @@ Likewise, Mistletoe attaches objects on an existing object and those attached ob
           mutator: '>=0.0.2'
           barback: '>=0.15.2+7'
 
-   ####Limitations of the transformer
+   #### Limitations of the transformer
+
    The transformer relies on: https://github.com/TastyCatFood/mutator and shares its limitations.
    +  Cannot refactor dynamically typed objects:
 
@@ -67,6 +68,7 @@ Likewise, Mistletoe attaches objects on an existing object and those attached ob
                 //The type of d is not known, so mistletoe transformer cannot handle the below.
                 return d.on(e).hi();
             }
+
         Do:
 
             if(d is Dynamism){
@@ -94,7 +96,9 @@ Likewise, Mistletoe attaches objects on an existing object and those attached ob
                 d.on(o).hi = 'hi';// refactoring fails.
                 f().on(o).hi = 'hi' //refactoring fails.
             }
+
         Do: `Dynamism d = f();` and never do `f().on(o).hi = 'hi'`.
+
 
 
 ## Changes in v1.0.0
