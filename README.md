@@ -59,7 +59,7 @@ Likewise, Mistletoe attaches objects on an existing object and those attached ob
           mutator: '>=0.0.2'
           barback: '>=0.15.2+7'
 
-   #### Limitations of the transformer
+#### Limitations of the transformer
 
    The transformer relies on: https://github.com/TastyCatFood/mutator and shares its limitations.
    +  Cannot refactor dynamically typed objects:
