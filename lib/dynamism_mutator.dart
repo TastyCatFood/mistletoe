@@ -71,7 +71,8 @@ List<String> extract_method_invocation_nodes(file_path){
 mutate_dynamism(String file_path,{String code}){
   //Assignment
   var m = new Mutator<AssignmentExpression>(
-      klass_name, pattern,assignmentExpressionReplacer);
+      klass_name, pattern,assignmentExpressionReplacer,
+      required_imports: ['package:mistletoe/mistletoe.dart']);
   if(code != null){
     code = m.mutate_t(file_path,code:code);
   }else{
