@@ -34,10 +34,13 @@ class Replacer extends Transformer {
       content = mutate_dynamism(path,code:content.toString());
       transform.addOutput(
           new Asset.fromString(id, content.toString()));
-    }
-//    else{
+    }else{
+      String content = await transform.primaryInput
+          .readAsString();
+      transform.addOutput(
+          new Asset.fromString(id, content.toString()));
       //look for the package folder
 //      path = 'packages/${id.package.toString()}/${id.path}';
-//    }
+    }
   }
 }
