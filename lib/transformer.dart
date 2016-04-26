@@ -4,43 +4,74 @@
 import 'package:barback/barback.dart';
 import 'dart:async';
 import 'package:mistletoe/dynamism_mutator.dart';
-import 'package:path/path.dart' as Path;
 import 'dart:io' show Platform, File;
 
+//
+//class Replacer extends AggregateTransformer {
+//  // A constructor named "asPlugin" is required. It can be empty, but
+//  // it must be present. It is how pub determines that you want this
+//  // class to be publicly available as a loadable transformer plugin.
+//  Replacer.asPlugin();
+//  classifyPrimary(AssetId id) {
+//    // Only process assets where the filename ends with "recipe.html".
+//    if (!id.path.endsWith('.dart')) return null;
+//    // Return the path string, minus the recipe itself.
+//    // This is where the output asset will be written.
+//    return Path.url.dirname(id.path);
+//  }
+//
+//  Future<bool> isPrimary(AssetId id) async =>
+//      id.extension == '.dart';
+//
+//  Future apply(AggregateTransform transform) async {
+//    List<Asset> assets = await transform.primaryInputs.toList();
+//
+//    for(Asset asset in assets){
+//      var id = asset.id;
+//      String path = id.path.toString();
+//      // If the asset belongs to a package,
+//      // id.path points to the url relative to package root.
+//      if(await new File(path).exists()){
+//        print('transforming file: $path');
+//        String content = await asset.readAsString();
+//        mutate_dynamism(path,code:content).then((String c){
+//          print('transformed file: $path result:$c');
+////          transform.addOutput(new Asset.fromString(id, c));
+//        });
+//
+//      }else{
+//        String content = await asset.readAsString();
+//        transform.addOutput(new Asset.fromString(id, content.toString()));
+//        //look for the package folder
+////      path = 'packages/${id.package.toString()}/${id.path}';
+//      }
+//    }
+//  }
+//}
 
 class Replacer extends Transformer {
-  Path.Context context;
-  // A constructor named "asPlugin" is required. It can be empty, but
-  // it must be present. It is how pub determines that you want this
-  // class to be publicly available as a loadable transformer plugin.
   Replacer.asPlugin();
 
-  Future<bool> isPrimary(AssetId id) async =>
-      id.extension == '.dart';
+  Future<bool> isPrimary(AssetId id) async => id.extension == '.dart';
 
   Future apply(Transform transform) async {
-    if(Platform.isWindows){
-      context ??= new Path.Context(style:Path.Style.windows);
-    }else{
-      context ??= new Path.Context(style:Path.Style.posix);
-    }
-    var id = transform.primaryInput.id;
-    String path = id.path.toString();
-    // If the asset belongs to a package,
-    // id.path points to the url relative to package root.
-    if(await new File(path).exists()){
-      String content = await transform.primaryInput
-          .readAsString();
-      content = mutate_dynamism(path,code:content.toString());
-      transform.addOutput(
-          new Asset.fromString(id, content.toString()));
-    }else{
-      String content = await transform.primaryInput
-          .readAsString();
-      transform.addOutput(
-          new Asset.fromString(id, content.toString()));
-      //look for the package folder
-//      path = 'packages/${id.package.toString()}/${id.path}';
+    var input = transform.primaryInput;
+    String path = input.id.path.toString();
+    if(await new File(path).exists()) {
+      var content = await input.readAsString();
+      var newContent = await mutate_dynamism(path,code:content);
+      transform.addOutput(new Asset.fromString(input.id, newContent));
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+

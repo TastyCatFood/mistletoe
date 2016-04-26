@@ -1,4 +1,5 @@
 import 'package:mutator/mutator.dart';
+import 'dart:async';
 
 const String klass_name = 'Dynamism';
 //todo consider changing pattern to a functor.
@@ -20,7 +21,7 @@ var assignmentExpressionReplacer =
   new AssignmentExpressionReplacer();
 
 ///A function for dynamism_mutator_basic_test.
-extract_assignment_nodes(file_path){
+extract_assignment_nodes(file_path)async{
   List nodes = [];
   var replacer = new AssignmentExpressionReplacer(
       filter:(AstNode e){
@@ -30,13 +31,13 @@ extract_assignment_nodes(file_path){
   );
   var m = new Mutator<AssignmentExpression>(
       klass_name, pattern,replacer);
-  m.mutate_t(file_path);
+  await m.mutate_t(file_path);
   return nodes;
 }
 
 
 ///A function for dynamism_mutator_basic_test.
-List<String> extract_property_access_nodes(file_path){
+extract_property_access_nodes(file_path)async{
   var nodes = [];
   var replacer = new PropertyAccessReplacer(
       filter:(AstNode e){
@@ -45,12 +46,12 @@ List<String> extract_property_access_nodes(file_path){
       });
   var m = new Mutator<PropertyAccess>(
       klass_name, pattern,replacer );
-  m.mutate_t(file_path);
+  await m.mutate_t(file_path);
   return nodes;
 }
 
 ///A function for dynamism_mutator_basic_test.
-List<String> extract_method_invocation_nodes(file_path){
+extract_method_invocation_nodes(file_path)async{
   List<String> nodes = [];
   var methodInvocationReplacer =
       new MethodInvocationReplacer(filter:(e){
@@ -59,7 +60,7 @@ List<String> extract_method_invocation_nodes(file_path){
       });
   var m = new Mutator<MethodInvocation>(klass_name,pattern,
     methodInvocationReplacer);
-  m.mutate_t(file_path);
+  await m.mutate_t(file_path);
   return nodes;
 }
 
@@ -68,28 +69,30 @@ List<String> extract_method_invocation_nodes(file_path){
 ///It fetches a child node of AssignmentExpression
 ///which is a PropertyAccess.
 ///
-mutate_dynamism(String file_path,{String code}){
+Future<String> mutate_dynamism(
+    String file_path,{String code})async{
   //Assignment
   var m = new Mutator<AssignmentExpression>(
       klass_name, pattern,assignmentExpressionReplacer,
       required_imports: ['package:mistletoe/mistletoe.dart']);
   if(code != null){
-    code = m.mutate_t(file_path,code:code);
+    code = await m.mutate_t(file_path,code:code);
   }else{
-    code = m.mutate_t(file_path);
+    code = await m.mutate_t(file_path);
   }
   //PropertyAccess
   m = new Mutator<PropertyAccess>(
       klass_name,
       pattern,
       propertyAccessReplacer );
-  code = m.mutate_t(file_path,code:code);
+  code = await m.mutate_t(file_path,code:code);
   //invocation
   m = new Mutator<MethodInvocation>(
       klass_name,pattern,methodInvocationReplacer);
-  code  = m.mutate_t(file_path,code:code);
+  code  = await m.mutate_t(file_path,code:code);
   return code;
 }
+
 
 class MethodInvocationReplacer {
   Function filter;

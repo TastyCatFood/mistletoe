@@ -6,7 +6,7 @@ import 'package:path/path.dart' as Path;
 import 'dart:io' show Platform, Directory,File;
 import 'package:test/test.dart';
 import 'package:mistletoe/dynamism_mutator.dart';
-
+import 'dart:async';
 const String klass_name = 'Dynamism';
 const String pattern =
     '^[a-z.A-Z_0-9]+\\.on\\'
@@ -79,8 +79,6 @@ void main() {
 }
 
 single_file_property_access_nodes_extraction_test(path,test_name){
-  List<String> nodes = extract_property_access_nodes(
-      path);
   List expected_output = [
     'p.on(p).greetings',
     'd.on(v).greetings',
@@ -90,7 +88,9 @@ single_file_property_access_nodes_extraction_test(path,test_name){
     'A.d.on(e).greetings',
     'n.d.on(e).greetings'
   ];
-  test(test_name,(){
+  test(test_name,()async{
+    List<String> nodes = await extract_property_access_nodes(
+        path);
     for(int i =0;i<nodes.length;++i){
       expect(expected_output[i],equals(nodes[i]));
     }
@@ -98,7 +98,6 @@ single_file_property_access_nodes_extraction_test(path,test_name){
   });
 }
 library_assignment_nodes_extraction_test(path,test_name){
-  List<String> nodes = extract_assignment_nodes(path);
   List<String> expected_output = [
     'd.on(e).greetings = \'hi from top level variable d\'',
     'd.on(e).f = (a, b) => a + \' \' + b',
@@ -109,12 +108,13 @@ library_assignment_nodes_extraction_test(path,test_name){
     'n.d.on(e).greetings = \'hi from an instance member of n\'',
     'n.d.on(e).f = (g) => g',
   ];
-  if(nodes.length != expected_output.length){
-    print(test_name);
-    print(expected_output);
-    print(nodes);
-  }
-  test(test_name,(){
+  test(test_name,() async{
+    List<String> nodes = await extract_assignment_nodes(path);
+    if(nodes.length != expected_output.length){
+      print(test_name);
+      print(expected_output);
+      print(nodes);
+    }
     for(int i = 0;i<nodes.length;++i){
       expect(nodes[i],equals(expected_output[i]));
     }
@@ -122,7 +122,6 @@ library_assignment_nodes_extraction_test(path,test_name){
   });
 }
 library_assignment_nodes_extraction_with_alias_test(path,test_name){
-  List<String> nodes = extract_assignment_nodes(path);
   List<String> expected_output = [
     'p.d.on(p.e).greetings = \'hi from top level variable d\'',
     'p.d.on(p.e).f = (a, b) => a + \' \' + b',
@@ -133,12 +132,13 @@ library_assignment_nodes_extraction_with_alias_test(path,test_name){
     'p.n.d.on(p.e).greetings = \'hi from an instance member of n\'',
     'p.n.d.on(p.e).f = (g) => g',
   ];
-  if(nodes.length != expected_output.length){
-    print(test_name);
-    print(expected_output);
-    print(nodes);
-  }
-  test(test_name,(){
+  test(test_name,()async{
+    List<String> nodes = await extract_assignment_nodes(path);
+    if(nodes.length != expected_output.length){
+      print(test_name);
+      print(expected_output);
+      print(nodes);
+    }
     for(int i = 0;i<nodes.length;++i){
       expect(nodes[i],equals(expected_output[i]));
     }
@@ -149,20 +149,20 @@ library_assignment_nodes_extraction_with_alias_test(path,test_name){
 ///the PropertyAccess nodes extracted are only ones
 ///in the file.
 library_file_property_access_nodes_extraction_test(path,test_name){
-  List<String> nodes = extract_property_access_nodes(
-      path);
   List expected_output = [
     'd.on(e).greetings',
     'd2.on(e).greetings',
     'A.d.on(e).greetings',
     'n.d.on(e).greetings'
   ];
-  if(nodes.length != expected_output.length){
-    print(test_name);
-    print(expected_output);
-    print(nodes);
-  }
-  test(test_name,(){
+  test(test_name,()async {
+    List<String> nodes = await extract_property_access_nodes(
+        path);
+    if(nodes.length != expected_output.length){
+      print(test_name);
+      print(expected_output);
+      print(nodes);
+    }
     for(int i =0;i<nodes.length;++i){
       expect(expected_output[i],equals(nodes[i]));
     }
@@ -170,20 +170,20 @@ library_file_property_access_nodes_extraction_test(path,test_name){
   });
 }
 library_file_property_access_nodes_extraction_with_alias_test(path,test_name){
-  List<String> nodes = extract_property_access_nodes(
-      path);
   List expected_output = [
     'p.d.on(p.e).greetings',
     'p.d2.on(p.e).greetings',
     'p.A.d.on(p.e).greetings',
     'p.n.d.on(p.e).greetings'
   ];
-  if(nodes.length != expected_output.length){
-    print(test_name);
-    print(expected_output);
-    print(nodes);
-  }
-  test(test_name,(){
+  test(test_name,()async{
+    List<String> nodes = await extract_property_access_nodes(
+        path);
+    if(nodes.length != expected_output.length){
+      print(test_name);
+      print(expected_output);
+      print(nodes);
+    }
     for(int i =0;i<nodes.length;++i){
       expect(expected_output[i],equals(nodes[i]));
     }
@@ -196,19 +196,18 @@ file_as_whole_final_test(path){
       './test/mutator_expected_results/'
           'basic_test_expected_output.dart');
 
-  String r = mutate_dynamism(path);
   String er = new File(expected_result_path)
       .readAsStringSync();
 
 //    new File(wpath ).writeAsStringSync(r);
-  test('Is output as expected?',(){
+  test('Is output as expected?',() async{
+    String r = await mutate_dynamism(path);
     expect(r,equals(er));
   });
 
 }
 
 method_invocation_nodes_extraction_test(path,test_name){
-  List<String> nodes = extract_method_invocation_nodes(path);
   List<String> er = [
     'd.on(e).f(\'function f called on d\', \' with 2 params\')',
     'd2.on(e).f(\'d2 function f\', \' cadded\')',
@@ -216,14 +215,14 @@ method_invocation_nodes_extraction_test(path,test_name){
     'n.d.on(e).f(\'instance member Dynamic d access passed\')'
   ];
 
-  test(test_name,(){
+  test(test_name,()async{
+    List<String> nodes = await extract_method_invocation_nodes(path);
     for(int i =0;i<nodes.length;++i){
       expect(er[i],equals(nodes[i]));
     }
   });
 }
 method_invocation_nodes_with_alias_extraction_test(path,test_name){
-  List<String> nodes = extract_method_invocation_nodes(path);
   List<String> er = [
     'p.d.on(p.e).f(\'function f called on d\', \' with 2 params\')',
     'p.d2.on(p.e).f(\'d2 function f\', \' cadded\')',
@@ -231,7 +230,8 @@ method_invocation_nodes_with_alias_extraction_test(path,test_name){
     'p.n.d.on(p.e).f(\'instance member Dynamic d access passed\')'
   ];
 
-  test(test_name,(){
+  test(test_name,()async{
+    List<String> nodes = await extract_method_invocation_nodes(path);
     for(int i =0;i<nodes.length;++i){
       expect(er[i],equals(nodes[i]));
     }
@@ -239,7 +239,6 @@ method_invocation_nodes_with_alias_extraction_test(path,test_name){
 }
 
 assignment_nodes_extraction_test(path,test_name){
-  List<String> nodes = extract_assignment_nodes(path);
   List<String> expected_output = [
     'd.on(e).greetings = \'hi from top level variable d\'',
     'd.on(e).f = (a, b) => a + \' \' + b',
@@ -251,12 +250,13 @@ assignment_nodes_extraction_test(path,test_name){
     'n.d.on(e).f = (g) => g',
     'p.on(p).greetings = \'hi from function\''
   ];
-  if(nodes.length != expected_output.length){
-    print(test_name);
-    print(expected_output);
-    print(nodes);
-  }
-  test(test_name,(){
+  test(test_name,()async{
+    List<String> nodes = await extract_assignment_nodes(path);
+    if(nodes.length != expected_output.length){
+      print(test_name);
+      print(expected_output);
+      print(nodes);
+    }
     for(int i = 0;i<nodes.length;++i){
       expect(nodes[i],equals(expected_output[i]));
     }

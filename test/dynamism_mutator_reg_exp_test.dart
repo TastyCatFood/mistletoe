@@ -1,6 +1,7 @@
 import 'package:mistletoe/dynamism_mutator.dart';
 import 'package:test/test.dart';
 import 'package:mutator/mutator.dart';
+import 'dart:async';
 /// A Test on the regular expression patterns used in
 /// dynamism_mutator.
 ///
@@ -26,7 +27,7 @@ simple_pattern_test(){
       return o_2;
     }
   """;
-  test('klass_name_regex_test',(){
+  test('klass_name_regex_test',() async{
     List nodes = [];
     var rep =new PropertyAccessReplacer(
             filter:(e){
@@ -41,7 +42,7 @@ simple_pattern_test(){
         });
     var m = new Mutator<PropertyAccess>(
         klass_name,pattern,rep );
-    m.mutate_t('',code:src,skip_type_check: true);
+    await m.mutate_t('',code:src,skip_type_check: true);
 
     var r = [
       'd.on(f(\'dummy\', () {print(\'hi\');})).hi',
