@@ -61,7 +61,7 @@ no main library file, the queued completer never completes.
 
    Transformer adds the following compile time dependencies:
 
-          mutator: '>=0.0.2'
+          mutator: '>=0.0.4'
           barback: '>=0.15.2+7'
 
 #### Limitations of the transformer
