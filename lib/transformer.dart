@@ -58,9 +58,13 @@ class Replacer extends Transformer {
     var input = transform.primaryInput;
     String path = input.id.path.toString();
     if(await new File(path).exists()) {
+      print('mistletoe transformer transforming file: $path');
       var content = await input.readAsString();
       var newContent = await mutate_dynamism(path,code:content);
       transform.addOutput(new Asset.fromString(input.id, newContent));
+    } else{
+      var content = await input.readAsString();
+      transform.addOutput(new Asset.fromString(input.id, content));
     }
   }
 }

@@ -36,8 +36,13 @@ Mistletoes or the group of plants in the genus Viscum are parasitic and grow on 
 Likewise, Mistletoe attaches objects on an existing object and those attached objects, provided there are no external references to them, share the lifespan with the host object.
 
 ## Known Issue
+#### Presence of orphaned part file crashes mistletoe transformer( irrelevant if no mistletoe transformer is used)
+When mistletoe transformer is used, the transformation of a part file
+is queued as a completer if such is requested before the transformation
+of the main library file. When a part file is orphaned and it has
+no main library file, the queued completer never completes.
 
-####  When `minify:true` is set, assigning properties with `=` or calling a dynamically added method breaks the code.
+#### When `minify:true` is set, assigning properties with `=` or calling a dynamically added method breaks the code.
 
     
         import 'package:mistletoe/mistletoe.dart';
@@ -48,7 +53,7 @@ Likewise, Mistletoe attaches objects on an existing object and those attached ob
             d.on(o).greetings = ()=>print('hello world');
             d.on(o).greetings();//prints hello world
         }
-####  Solution
+#### Solution
    Use the mistletoe transformer, add `- mistletoe` to pubspec.yaml as below:
 
         transformers:
